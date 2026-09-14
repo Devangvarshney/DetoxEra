@@ -1,0 +1,66 @@
+@import "tailwindcss";
+
+@theme {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+
+  /* AyurSutra Color Palette */
+  --color-ayur-green: #385E4D;
+  --color-ayur-green-light: #527B68;
+  --color-ayur-green-dark: #223F32;
+  --color-ayur-light: #FAF8F2;
+  --color-ayur-accent: #D49A4C;
+  --color-ayur-accent-hover: #BF873F;
+  --color-ayur-sand: #E5E0D4;
+  --color-ayur-text: #26332A;
+  --color-ayur-muted: #6C7A71;
+  --color-ayur-border: #D6DED9;
+  --color-ayur-surface: #FFFFFF;
+
+  --animate-fade-in: fade-in 0.3s ease-out;
+  --animate-slide-up: slide-up 0.4s ease-out;
+
+  @keyframes fade-in {
+    from { opacity: 0; }
+    to { opacity: 1; }
+  }
+
+  @keyframes slide-up {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+}
+
+@layer base {
+  :root {
+    --background: #FAF8F2;
+    --foreground: #26332A;
+  }
+  
+  html, body {
+    background-color: var(--background);
+    color: var(--foreground);
+    font-family: var(--font-inter), sans-serif;
+    -webkit-font-smoothing: antialiased;
+    min-height: 100vh;
+  }
+}
+
+@layer utilities {
+  .glass-card {
+    background: rgba(255, 255, 255, 0.85);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    box-shadow: 0 4px 30px rgba(0, 0, 0, 0.05);
+  }
+
+  .interactive-hover {
+    transition: all 0.2s ease-in-out;
+  }
+  
+  .interactive-hover:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.05);
+  }
+}
