@@ -1,14 +1,19 @@
 from fastapi import APIRouter, Depends, status
 from sqlalchemy.orm import Session
 from typing import List, Dict, Any
-from app.schemas.therapy import TherapyPlan, TherapyPlanCreate, TherapySession, SessionSchedule, SessionComplete, TherapyProgress
-from app.models.therapy import TherapyPlan as TherapyPlanModel
+from app.schemas.therapy import TherapyPlan, TherapyPlanCreate, TherapySession, SessionSchedule, SessionComplete, TherapyProgress, TherapyTemplate
+from app.models.therapy import TherapyPlan as TherapyPlanModel, TherapyTemplate as TherapyTemplateModel
 from app.dependencies.db import get_db
 from app.dependencies.auth import get_current_patient, get_current_practitioner, get_current_user
 from app.services.therapy_service import create_therapy_plan, schedule_session, complete_session
 from app.models.user import User, UserRole
 
 router = APIRouter()
+
+@router.get("/templates", response_model=List[TherapyTemplate])
+def list_therapy_templates(db: Session = Depends(get_db)):
+    """List all available Panchakarma therapy templates."""
+    return db.query(TherapyTemplateModel).all()
 
 @router.post("/plans", response_model=TherapyPlan, status_code=status.HTTP_201_CREATED)
 def create_plan(plan_in: TherapyPlanCreate, current_user: User = Depends(get_current_practitioner), db: Session = Depends(get_db)):

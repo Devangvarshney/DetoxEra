@@ -1,6 +1,6 @@
 from fastapi import APIRouter, Depends
 from sqlalchemy.orm import Session
-from typing import List
+from typing import List, Optional
 from app.schemas.practitioner import Practitioner, PractitionerUpdate
 from app.dependencies.db import get_db
 from app.dependencies.auth import get_current_user, get_current_practitioner
@@ -10,8 +10,8 @@ from app.models.user import User
 router = APIRouter()
 
 @router.get("", response_model=List[Practitioner])
-def read_practitioners(db: Session = Depends(get_db)):
-    return get_practitioners(db)
+def read_practitioners(city: Optional[str] = None, only_completed: bool = False, db: Session = Depends(get_db)):
+    return get_practitioners(db, city=city, only_completed=only_completed)
 
 @router.get("/{id}", response_model=Practitioner)
 def read_practitioner(id: int, db: Session = Depends(get_db)):

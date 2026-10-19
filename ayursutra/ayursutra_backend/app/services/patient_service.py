@@ -6,7 +6,10 @@ from app.schemas.patient import PatientUpdate
 def get_patient_by_user_id(db: Session, user_id: int) -> Patient:
     patient = db.query(Patient).filter(Patient.user_id == user_id).first()
     if not patient:
-        raise HTTPException(status_code=404, detail="Patient profile not found")
+        patient = Patient(user_id=user_id, name="", age=None, gender=None, phone=None)
+        db.add(patient)
+        db.commit()
+        db.refresh(patient)
     return patient
 
 def update_patient_profile(db: Session, user_id: int, patient_in: PatientUpdate) -> Patient:

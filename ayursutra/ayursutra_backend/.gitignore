@@ -1,0 +1,30 @@
+# Virtual environment
+venv/
+.venv/
+env/
+ENV/
+
+# Environment secrets — NEVER commit these
+.env
+.env.local
+.env.production
+
+# Python cache
+__pycache__/
+*.py[cod]
+*$py.class
+*.pyc
+
+# Alembic runtime
+alembic/versions/__pycache__/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+
+# Test artifacts
+.pytest_cache/
+*.egg-info/
+dist/
+build/

@@ -7,6 +7,16 @@ class PractitionerBase(BaseModel):
     specialization: Optional[str] = None
     qualification: Optional[str] = None
     experience: Optional[str] = None
+    city: Optional[str] = None
+    clinic_name: Optional[str] = None
+    clinic_address: Optional[str] = None
+    consultation_fee: Optional[str] = None
+    phone: Optional[str] = None
+    accreditation: Optional[str] = None
+    therapies: Optional[str] = None
+    profile_image: Optional[str] = None
+    timing: Optional[str] = None
+    is_profile_completed: Optional[bool] = False
     bio: Optional[str] = None
     availability: Optional[str] = None
 
@@ -18,6 +28,16 @@ class PractitionerUpdate(BaseModel):
     specialization: Optional[str] = None
     qualification: Optional[str] = None
     experience: Optional[str] = None
+    city: Optional[str] = None
+    clinic_name: Optional[str] = None
+    clinic_address: Optional[str] = None
+    consultation_fee: Optional[str] = None
+    phone: Optional[str] = None
+    accreditation: Optional[str] = None
+    therapies: Optional[str] = None
+    profile_image: Optional[str] = None
+    timing: Optional[str] = None
+    is_profile_completed: Optional[bool] = None
     bio: Optional[str] = None
     availability: Optional[str] = None
 

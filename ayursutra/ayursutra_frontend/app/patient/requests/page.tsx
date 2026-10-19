@@ -2,7 +2,6 @@
 
 import { useQuery } from "@tanstack/react-query";
 import { useAuth } from "@/providers/auth-provider";
-import { MessageSquare } from "lucide-react";
 import Link from "next/link";
 import { api } from "@/lib/api/client";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
@@ -24,42 +23,55 @@ export default function PatientRequestsPage() {
 
   return (
     <div className="container mx-auto p-6 max-w-4xl animate-fade-in">
-      <h1 className="text-3xl font-outfit font-bold text-ayur-green-dark mb-6">Treatment Requests</h1>
+      <h1 className="text-3xl font-outfit font-bold mb-6" style={{ color: "var(--accent-green, #085560)" }}>Treatment Requests</h1>
       
       <Card className="glass-card">
         <CardHeader>
-          <CardTitle className="text-xl">Your Sent Requests</CardTitle>
+          <CardTitle className="text-xl" style={{ color: "var(--text-primary)" }}>Your Sent Requests</CardTitle>
         </CardHeader>
         <CardContent>
           {requests && requests.length > 0 ? (
             <div className="space-y-4">
               {requests.map((request: any) => (
-                <div key={request.id} className="p-4 border border-ayur-border rounded-lg bg-white shadow-sm flex flex-col md:flex-row justify-between gap-4">
+                <div
+                  key={request.id}
+                  className="p-4 rounded-xl flex flex-col md:flex-row justify-between gap-4 transition-all"
+                  style={{
+                    background: "var(--surface)",
+                    border: "1px solid var(--border-color)",
+                    boxShadow: "0 2px 8px rgba(0,0,0,0.06)"
+                  }}
+                >
                   <div>
                     <div className="flex items-center gap-3 mb-2">
-                      <h3 className="font-semibold text-ayur-green-dark">Dr. {request.practitioner.name}</h3>
+                      <h3 className="font-semibold" style={{ color: "var(--accent-green, #0E7C86)" }}>
+                        Dr. {request.practitioner.name.replace(/^Dr\.?\s*/i, "")}
+                      </h3>
                       <Badge variant={
-                        request.status === "accepted" ? "success" : 
-                        request.status === "rejected" ? "destructive" : 
+                        request.status === "accepted" ? "success" :
+                        request.status === "rejected" ? "destructive" :
                         "secondary"
                       }>
                         {request.status.toUpperCase()}
                       </Badge>
                     </div>
-                    <p className="text-sm text-ayur-text mb-2"><strong>Specialization:</strong> {request.practitioner.specialization}</p>
-                    <p className="text-sm text-gray-600 bg-gray-50 p-3 rounded-md italic">"{request.message}"</p>
-                    <p className="text-xs text-ayur-muted mt-3">Sent on: {new Date(request.created_at).toLocaleDateString()}</p>
+                    <p className="text-sm mb-2" style={{ color: "var(--text-primary)" }}>
+                      <strong>Specialization:</strong> {request.practitioner.specialization}
+                    </p>
+                    <p
+                      className="text-sm p-3 rounded-lg italic"
+                      style={{
+                        color: "var(--text-muted)",
+                        background: "var(--surface-muted)",
+                        border: "1px solid var(--border-color)"
+                      }}
+                    >
+                      &ldquo;{request.message}&rdquo;
+                    </p>
+                    <p className="text-xs mt-3" style={{ color: "var(--text-muted)" }}>
+                      Sent on: {new Date(request.created_at).toLocaleDateString()}
+                    </p>
                   </div>
-                  {request.status === "accepted" && (
-                    <div className="flex items-center">
-                      <Link href={`/patient/chat/${request.id}`}>
-                        <Button variant="default" className="gap-2">
-                          <MessageSquare className="w-4 h-4" />
-                          Chat
-                        </Button>
-                      </Link>
-                    </div>
-                  )}
                 </div>
               ))}
             </div>

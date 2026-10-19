@@ -1,4 +1,4 @@
-from sqlalchemy import Column, Integer, String, ForeignKey, DateTime, Enum, Text, Float, Time, Date
+from sqlalchemy import Column, Integer, String, ForeignKey, DateTime, Enum, Text, Float, Time, Date, Boolean
 from sqlalchemy.orm import relationship
 from sqlalchemy.sql import func
 from app.core.database import Base
@@ -58,6 +58,7 @@ class TherapyPlan(Base):
     patient = relationship("Patient", back_populates="therapy_plans")
     practitioner = relationship("Practitioner", back_populates="therapy_plans")
     sessions = relationship("TherapySession", back_populates="therapy_plan", cascade="all, delete-orphan")
+    milestones = relationship("TherapyMilestone", back_populates="therapy_plan", cascade="all, delete-orphan")
 
 class TherapySession(Base):
     __tablename__ = "therapy_sessions"
@@ -80,3 +81,17 @@ class TherapySession(Base):
 
     therapy_plan = relationship("TherapyPlan", back_populates="sessions")
     feedback = relationship("Feedback", back_populates="session", uselist=False)
+
+class TherapyMilestone(Base):
+    __tablename__ = "therapy_milestones"
+
+    id = Column(Integer, primary_key=True, index=True)
+    therapy_plan_id = Column(Integer, ForeignKey("therapy_plans.id"), nullable=False, index=True)
+    title = Column(String(255), nullable=False)
+    description = Column(Text)
+    target_session = Column(Integer, nullable=True)  # After which session this milestone should be achieved
+    is_achieved = Column(Boolean, default=False)
+    achieved_at = Column(DateTime(timezone=True), nullable=True)
+    created_at = Column(DateTime(timezone=True), server_default=func.now())
+
+    therapy_plan = relationship("TherapyPlan", back_populates="milestones")

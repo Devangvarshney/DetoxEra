@@ -5,6 +5,8 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 import { api } from "@/lib/api/client";
+import { useAuth } from "@/providers/auth-provider";
+import { GoogleSignInButton } from "@/components/auth/google-sign-in-button";
 import { useRouter } from "next/navigation";
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -20,12 +22,14 @@ const schema = z.object({
   specialization: z.string().min(2, { message: "Specialization is required" }),
   qualification: z.string().min(2, { message: "Qualification is required" }),
   experience: z.string().min(1, { message: "Experience is required" }),
+  city: z.string().min(2, { message: "City is required" }),
 });
 
 type FormData = z.infer<typeof schema>;
 
 export default function PractitionerRegisterPage() {
   const router = useRouter();
+  const { login } = useAuth();
   const [error, setError] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [success, setSuccess] = useState(false);
@@ -53,6 +57,7 @@ export default function PractitionerRegisterPage() {
           specialization: data.specialization,
           qualification: data.qualification,
           experience: data.experience,
+          city: data.city,
         }
       });
       setSuccess(true);
@@ -131,11 +136,35 @@ export default function PractitionerRegisterPage() {
                 {errors.experience && <p className="text-xs text-red-500">{errors.experience.message}</p>}
               </div>
             </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="city">Practicing City / Location</Label>
+              <Input id="city" placeholder="e.g. Delhi NCR, Mumbai, Bengaluru" {...register("city")} />
+              {errors.city && <p className="text-xs text-red-500">{errors.city.message}</p>}
+            </div>
             
             <Button type="submit" className="w-full shadow-md bg-ayur-accent hover:bg-ayur-accent-hover text-white" disabled={isLoading}>
               {isLoading ? "Creating account..." : "Register as Practitioner"}
             </Button>
           </form>
+
+          {/* Divider */}
+          <div className="relative my-4">
+            <div className="absolute inset-0 flex items-center">
+              <span className="w-full border-t border-gray-100" />
+            </div>
+            <div className="relative flex justify-center text-[10px] uppercase">
+              <span className="bg-white px-2 text-ayur-muted font-medium">Or quick register with</span>
+            </div>
+          </div>
+
+          {/* Google Sign Up */}
+          <GoogleSignInButton
+            role="practitioner"
+            onSuccess={(token) => login(token)}
+            onError={(msg) => setError(msg)}
+            text="signup_with"
+          />
           
           <div className="mt-6 text-center text-sm">
             <span className="text-ayur-muted">Looking for a patient account? </span>

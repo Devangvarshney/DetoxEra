@@ -73,7 +73,7 @@ export function ProgressChart({ planId }: { planId: number }) {
               />
               <Tooltip 
                 contentStyle={{ borderRadius: '8px', border: 'none', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)' }}
-                formatter={(value: number) => [`${value} Stars`, 'Rating']}
+                formatter={(value: any) => [`${value} Stars`, 'Rating']}
               />
               <Line 
                 type="monotone" 

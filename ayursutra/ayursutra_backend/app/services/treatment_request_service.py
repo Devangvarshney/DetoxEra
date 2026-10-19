@@ -14,7 +14,24 @@ def create_treatment_request(db: Session, request_in: TreatmentRequestCreate, pa
     ).first()
     
     if existing:
-        raise HTTPException(status_code=400, detail="An active request with this practitioner already exists.")
+        if existing.status == RequestStatus.PENDING:
+            # Update the message of the pending request with latest details
+            existing.message = request_in.message
+            db.commit()
+            db.refresh(existing)
+            
+            practitioner_user_id = existing.practitioner.user_id
+            create_notification(db, NotificationCreate(
+                user_id=practitioner_user_id,
+                type="TREATMENT_REQUEST_RECEIVED",
+                title="Treatment Request Updated",
+                message=f"{existing.patient.name} updated their consultation request symptoms.",
+                related_entity_type="treatment_request",
+                related_entity_id=existing.id
+            ))
+            return existing
+        else:
+            raise HTTPException(status_code=400, detail="You already have an active treatment plan with this practitioner. Please check your Therapies tab.")
         
     db_request = TreatmentRequest(
         patient_id=patient_id,

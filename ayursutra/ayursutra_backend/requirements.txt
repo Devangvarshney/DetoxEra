@@ -13,3 +13,5 @@ python-multipart
 pytest
 httpx
 python-dotenv
+google-auth
+requests

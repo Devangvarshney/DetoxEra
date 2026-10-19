@@ -1,7 +1,6 @@
 "use client";
 
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { MessageSquare } from "lucide-react";
 import Link from "next/link";
 import { api } from "@/lib/api/client";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
@@ -36,7 +35,7 @@ export default function PractitionerRequestsPage() {
   return (
     <div className="container mx-auto p-6 max-w-4xl animate-fade-in">
       <h1 className="text-3xl font-outfit font-bold text-ayur-green-dark mb-6">Received Requests</h1>
-      
+
       <Card className="glass-card">
         <CardHeader>
           <CardTitle className="text-xl">Treatment Requests from Patients</CardTitle>
@@ -65,16 +64,16 @@ export default function PractitionerRequestsPage() {
                     <div className="flex flex-col gap-2 min-w-[120px]">
                       {request.status === "pending" ? (
                         <>
-                          <Button 
-                            size="sm" 
+                          <Button
+                            size="sm"
                             className="w-full bg-ayur-green hover:bg-ayur-green-dark text-white"
                             onClick={() => updateStatusMutation.mutate({ id: request.id, status: "accepted" })}
                             disabled={updateStatusMutation.isPending}
                           >
                             Accept
                           </Button>
-                          <Button 
-                            size="sm" 
+                          <Button
+                            size="sm"
                             variant="destructive"
                             className="w-full"
                             onClick={() => updateStatusMutation.mutate({ id: request.id, status: "rejected" })}
@@ -83,12 +82,6 @@ export default function PractitionerRequestsPage() {
                             Reject
                           </Button>
                         </>
-                      ) : request.status === "accepted" ? (
-                        <Link href={`/practitioner/chat/${request.id}`} className="w-full">
-                          <Button size="sm" variant="default" className="w-full gap-2">
-                            <MessageSquare className="w-4 h-4" /> Chat
-                          </Button>
-                        </Link>
                       ) : null}
                     </div>
                   </div>

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, Suspense } from "react";
 import { useForm } from "react-hook-form";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { api } from "@/lib/api/client";
@@ -10,7 +10,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 
-export default function NewTherapyPlanPage() {
+function NewTherapyPlanContent() {
   const searchParams = useSearchParams();
   const patientId = searchParams.get("patient_id");
   const router = useRouter();
@@ -103,5 +103,13 @@ export default function NewTherapyPlanPage() {
         </CardContent>
       </Card>
     </div>
+  );
+}
+
+export default function NewTherapyPlanPage() {
+  return (
+    <Suspense fallback={<div className="p-8 text-center text-xs text-ayur-muted">Loading plan form...</div>}>
+      <NewTherapyPlanContent />
+    </Suspense>
   );
 }

@@ -1,0 +1,8 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">AyurSutra</string>
+    <string name="title_activity_main">AyurSutra</string>
+    <string name="package_name">com.ayursutra.app</string>
+    <string name="custom_url_scheme">com.ayursutra.app</string>
+    <string name="server_client_id">348329351587-7a722sgnm0tlcfs3gotue709jspsi3ph.apps.googleusercontent.com</string>
+</resources>

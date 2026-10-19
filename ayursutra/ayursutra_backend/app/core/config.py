@@ -17,7 +17,8 @@ class Settings(BaseSettings):
     # Application Secrets
     SECRET_KEY: str = "ayursutra-secret-key-32b-secure-jwt-token-key-2024"
     ACCESS_TOKEN_EXPIRE_MINUTES: int = 60
-    CORS_ORIGINS: str = "http://localhost:3000,http://localhost:5173"
+    GOOGLE_CLIENT_ID: Optional[str] = None
+    CORS_ORIGINS: str = "http://localhost:3000,http://localhost:5173,http://localhost:8081,http://127.0.0.1:8081,http://10.243.0.162:8081,http://10.243.0.162:3000,http://192.168.1.50:8081,http://192.168.1.50:3000,http://192.168.56.77:8081,http://192.168.56.77:3000,http://localhost,https://localhost,capacitor://localhost"
 
     model_config = SettingsConfigDict(env_file=".env", extra="ignore")
 

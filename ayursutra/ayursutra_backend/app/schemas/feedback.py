@@ -7,6 +7,8 @@ from .practitioner import Practitioner
 class FeedbackBase(BaseModel):
     rating: int = Field(ge=1, le=5)
     comments: Optional[str] = None
+    symptoms_reported: Optional[str] = None   # comma-separated symptom tags
+    improvement_level: Optional[int] = Field(default=None, ge=1, le=5)
 
 class FeedbackCreate(FeedbackBase):
     pass
@@ -24,3 +26,4 @@ class FeedbackInDBBase(FeedbackBase):
 class Feedback(FeedbackInDBBase):
     patient: Optional[Patient] = None
     practitioner: Optional[Practitioner] = None
+

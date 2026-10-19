@@ -11,7 +11,8 @@ from app.schemas.auth import Token
 from app.schemas.user import UserCreate, User as UserSchema
 from app.schemas.patient import PatientCreate
 from app.schemas.practitioner import PractitionerCreate
-from app.services.auth_service import register_patient, register_practitioner
+from app.schemas.google_auth import GoogleLoginRequest
+from app.services.auth_service import register_patient, register_practitioner, login_or_register_google_user
 from app.models.user import User
 
 router = APIRouter()
@@ -43,6 +44,11 @@ def login(form_data: OAuth2PasswordRequestForm = Depends(), db: Session = Depend
         subject=user.id, role=user.role, expires_delta=access_token_expires
     )
     return {"access_token": access_token, "token_type": "bearer"}
+
+@router.post("/google", response_model=Token)
+def login_with_google(request: GoogleLoginRequest, db: Session = Depends(get_db)):
+    result = login_or_register_google_user(db, request.credential, request.role)
+    return {"access_token": result["access_token"], "token_type": result["token_type"]}
 
 @router.get("/me", response_model=UserSchema)
 def read_users_me(current_user: User = Depends(get_current_user)):
