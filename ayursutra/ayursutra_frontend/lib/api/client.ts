@@ -24,7 +24,7 @@ export const getApiBaseUrl = (): string => {
     }
   }
 
-  return "http://localhost:8000";
+  return "https://detoxera.onrender.com";
 };
 
 export const API_URL = getApiBaseUrl();
