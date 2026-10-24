@@ -8,6 +8,7 @@ interface User {
   id: number;
   email: string;
   role: "patient" | "practitioner";
+  name?: string;
 }
 
 interface AuthContextType {
@@ -66,10 +67,22 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const login = (token: string) => {
     localStorage.setItem("token", token);
     api.defaults.headers.common["Authorization"] = `Bearer ${token}`;
-    api.get("/auth/me").then((res: any) => {
-      setUser(res.data);
-      router.push(`/${res.data.role}/dashboard`);
-    });
+    api.get("/auth/me")
+      .then((res: any) => {
+        setUser(res.data);
+        router.push(`/${res.data.role}/dashboard`);
+      })
+      .catch((err: any) => {
+        console.error("Failed to load user profile after login:", err);
+        try {
+          const payload = JSON.parse(atob(token.split(".")[1]));
+          const role = payload.role || "patient";
+          setUser({ id: Number(payload.sub), email: "", role });
+          router.push(`/${role}/dashboard`);
+        } catch {
+          router.push("/login");
+        }
+      });
   };
 
   const logout = () => {

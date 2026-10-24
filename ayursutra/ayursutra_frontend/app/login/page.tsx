@@ -4,7 +4,7 @@ import { useState } from "react";
 import { useForm as useHookForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
-import { api } from "@/lib/api/client";
+import { api, getApiErrorMessage } from "@/lib/api/client";
 import { useAuth } from "@/providers/auth-provider";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -60,11 +60,7 @@ export default function LoginPage() {
       });
       login(res.data.access_token);
     } catch (err: any) {
-      if (!err.response) {
-        setError("Cannot reach backend server. Please verify the backend is running with --host 0.0.0.0.");
-      } else {
-        setError(err.response?.data?.detail || "Invalid email or password. Please try again.");
-      }
+      setError(getApiErrorMessage(err, "Invalid email or password. Please try again."));
     } finally {
       setIsLoading(false);
     }

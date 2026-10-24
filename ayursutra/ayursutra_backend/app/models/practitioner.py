@@ -28,3 +28,5 @@ class Practitioner(Base):
     treatment_requests = relationship("TreatmentRequest", back_populates="practitioner")
     therapy_plans = relationship("TherapyPlan", back_populates="practitioner")
     feedback = relationship("Feedback", back_populates="practitioner")
+    clinics = relationship("PractitionerClinic", back_populates="practitioner", cascade="all, delete-orphan")
+    reviews = relationship("PractitionerReview", back_populates="practitioner", cascade="all, delete-orphan")

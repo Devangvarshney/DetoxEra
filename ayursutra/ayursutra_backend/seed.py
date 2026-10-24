@@ -11,6 +11,9 @@ from app.models.therapy import TherapyTemplate
 from app.core.security import get_password_hash
 
 def seed_db():
+    from app.core.database import Base, engine
+    import app.models
+    Base.metadata.create_all(bind=engine)
     db = SessionLocal()
     
     # Check if practitioners exist

@@ -4,7 +4,7 @@ import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
-import { api } from "@/lib/api/client";
+import { api, getApiErrorMessage } from "@/lib/api/client";
 import { useAuth } from "@/providers/auth-provider";
 import { GoogleSignInButton } from "@/components/auth/google-sign-in-button";
 import { useRouter } from "next/navigation";
@@ -65,7 +65,7 @@ export default function PractitionerRegisterPage() {
         router.push("/login");
       }, 2000);
     } catch (err: any) {
-      setError(err.response?.data?.detail || "Registration failed");
+      setError(getApiErrorMessage(err, "Registration failed. Please try again."));
     } finally {
       setIsLoading(false);
     }

@@ -18,3 +18,4 @@ class Patient(Base):
     treatment_requests = relationship("TreatmentRequest", back_populates="patient")
     therapy_plans = relationship("TherapyPlan", back_populates="patient")
     feedback = relationship("Feedback", back_populates="patient")
+    practitioner_reviews = relationship("PractitionerReview", back_populates="patient")

@@ -4,7 +4,7 @@ import { useState, useEffect, Suspense } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
-import { api } from "@/lib/api/client";
+import { api, getApiErrorMessage } from "@/lib/api/client";
 import { useAuth } from "@/providers/auth-provider";
 import { GoogleSignInButton } from "@/components/auth/google-sign-in-button";
 import { useRouter, useSearchParams } from "next/navigation";
@@ -130,7 +130,7 @@ function RegisterForm() {
       setSuccess(true);
       setTimeout(() => router.push("/login"), 2000);
     } catch (err: any) {
-      setError(err.response?.data?.detail || "Registration failed. Please try again.");
+      setError(getApiErrorMessage(err, "Registration failed. Please try again."));
     } finally {
       setIsLoading(false);
     }
@@ -153,7 +153,7 @@ function RegisterForm() {
       setSuccess(true);
       setTimeout(() => router.push("/login"), 2000);
     } catch (err: any) {
-      setError(err.response?.data?.detail || "Registration failed. Please try again.");
+      setError(getApiErrorMessage(err, "Registration failed. Please try again."));
     } finally {
       setIsLoading(false);
     }

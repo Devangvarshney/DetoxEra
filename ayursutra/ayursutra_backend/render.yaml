@@ -1,0 +1,19 @@
+services:
+  - type: web
+    name: ayursutra-backend
+    runtime: python
+    buildCommand: pip install --upgrade pip && pip install -r requirements.txt
+    startCommand: uvicorn app.main:app --host 0.0.0.0 --port $PORT
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.11.9
+      - key: SECRET_KEY
+        generateValue: true
+      - key: ACCESS_TOKEN_EXPIRE_MINUTES
+        value: 60
+      - key: GOOGLE_CLIENT_ID
+        value: 348329351587-7a722sgnm0tlcfs3gotue709jspsi3ph.apps.googleusercontent.com
+      - key: CORS_ORIGINS
+        value: "http://localhost:3000,http://localhost,https://localhost,capacitor://localhost,*"
+      - key: DATABASE_URL
+        sync: false

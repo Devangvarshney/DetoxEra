@@ -1,6 +1,8 @@
 from pydantic import BaseModel
-from typing import Optional
+from typing import Optional, List
 from .user import User
+from .practitioner_clinic import PractitionerClinic, PractitionerClinicCreate
+from .practitioner_review import PractitionerReview
 
 class PractitionerBase(BaseModel):
     name: str
@@ -40,6 +42,7 @@ class PractitionerUpdate(BaseModel):
     is_profile_completed: Optional[bool] = None
     bio: Optional[str] = None
     availability: Optional[str] = None
+    clinics: Optional[List[PractitionerClinicCreate]] = None
 
 class PractitionerInDBBase(PractitionerBase):
     id: int
@@ -49,7 +52,9 @@ class PractitionerInDBBase(PractitionerBase):
         from_attributes = True
 
 class Practitioner(PractitionerInDBBase):
-    pass
+    clinics: Optional[List[PractitionerClinic]] = []
+    reviews: Optional[List[PractitionerReview]] = []
 
 class PractitionerWithUser(Practitioner):
     user: User
+

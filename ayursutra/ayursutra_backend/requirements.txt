@@ -3,6 +3,7 @@ uvicorn[standard]
 sqlalchemy
 pymysql
 psycopg2-binary
+psycopg[binary]
 alembic
 pydantic[email]
 pydantic-settings
@@ -15,3 +16,4 @@ httpx
 python-dotenv
 google-auth
 requests
+supabase

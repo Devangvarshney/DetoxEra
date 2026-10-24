@@ -2,8 +2,7 @@
 
 import React, { useState } from "react";
 import { GoogleLogin, CredentialResponse } from "@react-oauth/google";
-import { api } from "@/lib/api/client";
-
+import { api, getApiErrorMessage } from "@/lib/api/client";
 import { Capacitor } from "@capacitor/core";
 
 interface GoogleSignInButtonProps {
@@ -46,9 +45,7 @@ export function GoogleSignInButton({
       });
       onSuccess(res.data.access_token);
     } catch (err: any) {
-      onError(
-        err.response?.data?.detail || "Google authentication failed. Please try again."
-      );
+      onError(getApiErrorMessage(err, "Google authentication failed. Please try again."));
     } finally {
       setLoading(false);
     }
@@ -77,11 +74,10 @@ export function GoogleSignInButton({
       onSuccess(backendRes.data.access_token);
     } catch (err: any) {
       console.error("Native Google sign-in error:", err);
-      // If user cancelled, don't show an intrusive error
       if (err?.message?.includes("cancel") || err?.code === "USER_CANCELLED") {
         return;
       }
-      onError(err.response?.data?.detail || err.message || "Native Google sign-in failed.");
+      onError(getApiErrorMessage(err, "Native Google sign-in failed."));
     } finally {
       setLoading(false);
     }
@@ -100,7 +96,7 @@ export function GoogleSignInButton({
       });
       onSuccess(res.data.access_token);
     } catch (err: any) {
-      onError(err.response?.data?.detail || "Demo Google sign-in failed.");
+      onError(getApiErrorMessage(err, "Demo Google sign-in failed."));
     } finally {
       setLoading(false);
     }
@@ -140,16 +136,26 @@ export function GoogleSignInButton({
           <span>Sign in with Google</span>
         </button>
       ) : isCustomClientIdConfigured ? (
-        <div className="w-full flex justify-center">
-          <GoogleLogin
-            onSuccess={handleGoogleSuccess}
-            onError={() => onError("Google Sign-In was cancelled or failed.")}
-            theme="outline"
-            size="large"
-            width="100%"
-            text={text}
-            shape="rectangular"
-          />
+        <div className="w-full flex flex-col items-center gap-2">
+          <div className="w-full flex justify-center">
+            <GoogleLogin
+              onSuccess={handleGoogleSuccess}
+              onError={() => onError("Google Sign-In was cancelled or failed. Check Authorized Origins in Google Cloud Console.")}
+              theme="outline"
+              size="large"
+              width="100%"
+              text={text}
+              shape="rectangular"
+            />
+          </div>
+          <button
+            type="button"
+            onClick={handleDemoGoogleSignIn}
+            disabled={loading}
+            className="text-[11px] text-ayur-muted hover:text-ayur-green transition-colors underline decoration-dotted"
+          >
+            {loading ? "Signing in..." : `⚡ Quick Test with 1-Click Google Sign-In (${role === "patient" ? "Patient" : "Doctor"})`}
+          </button>
         </div>
       ) : (
         <button

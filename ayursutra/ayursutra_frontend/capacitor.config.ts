@@ -5,8 +5,7 @@ const config: CapacitorConfig = {
   appName: 'AyurSutra',
   webDir: 'out',
   server: {
-    url: 'http://10.243.0.162:3000',
-    cleartext: true
+    androidScheme: 'https'
   }
 };
 

@@ -28,19 +28,28 @@ app.include_router(milestones.router, prefix="/milestones", tags=["Milestones"])
 @app.on_event("startup")
 def startup_db_migration():
     try:
-        from app.core.database import engine
-        from sqlalchemy import text
+        from app.core.database import engine, Base
+        import app.models
+        from sqlalchemy import text, inspect
+        Base.metadata.create_all(bind=engine)
+        inspector = inspect(engine)
+        existing_cols = [c["name"] for c in inspector.get_columns("practitioners")]
+        new_cols = [
+            ("city", "VARCHAR(255)"),
+            ("clinic_name", "VARCHAR(255)"),
+            ("clinic_address", "VARCHAR(500)"),
+            ("consultation_fee", "VARCHAR(50)"),
+            ("phone", "VARCHAR(50)"),
+            ("accreditation", "VARCHAR(255)"),
+            ("therapies", "VARCHAR(500)"),
+            ("profile_image", "VARCHAR(1000)"),
+            ("timing", "VARCHAR(255)"),
+            ("is_profile_completed", "BOOLEAN DEFAULT FALSE"),
+        ]
         with engine.connect() as conn:
-            conn.execute(text("ALTER TABLE practitioners ADD COLUMN IF NOT EXISTS city VARCHAR(255);"))
-            conn.execute(text("ALTER TABLE practitioners ADD COLUMN IF NOT EXISTS clinic_name VARCHAR(255);"))
-            conn.execute(text("ALTER TABLE practitioners ADD COLUMN IF NOT EXISTS clinic_address VARCHAR(500);"))
-            conn.execute(text("ALTER TABLE practitioners ADD COLUMN IF NOT EXISTS consultation_fee VARCHAR(50);"))
-            conn.execute(text("ALTER TABLE practitioners ADD COLUMN IF NOT EXISTS phone VARCHAR(50);"))
-            conn.execute(text("ALTER TABLE practitioners ADD COLUMN IF NOT EXISTS accreditation VARCHAR(255);"))
-            conn.execute(text("ALTER TABLE practitioners ADD COLUMN IF NOT EXISTS therapies VARCHAR(500);"))
-            conn.execute(text("ALTER TABLE practitioners ADD COLUMN IF NOT EXISTS profile_image VARCHAR(1000);"))
-            conn.execute(text("ALTER TABLE practitioners ADD COLUMN IF NOT EXISTS timing VARCHAR(255);"))
-            conn.execute(text("ALTER TABLE practitioners ADD COLUMN IF NOT EXISTS is_profile_completed BOOLEAN DEFAULT FALSE;"))
+            for col_name, col_type in new_cols:
+                if col_name not in existing_cols:
+                    conn.execute(text(f"ALTER TABLE practitioners ADD COLUMN {col_name} {col_type};"))
             conn.commit()
     except Exception as e:
         print(f"Database migration notice: {e}")

@@ -6,7 +6,7 @@ import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { useState } from "react";
 import { Star, CheckCircle, Clock, AlertTriangle, ChevronDown, ChevronUp, MessageSquare, Shield, Award } from "lucide-react";
-import { useParams } from "next/navigation";
+import { useParams, useSearchParams } from "next/navigation";
 import { ProgressChart } from "@/components/shared/ProgressChart";
 
 const STATUS_CONFIG = {
@@ -24,7 +24,8 @@ const SYMPTOM_TAGS = [
 
 export default function PatientSessionsClient() {
   const params = useParams();
-  const planId = params?.id as string;
+  const searchParams = useSearchParams();
+  const planId = (params?.id as string) || searchParams?.get("id") || searchParams?.get("plan_id") || "";
 
   const { data: plan, isLoading: isPlanLoading } = useQuery({
     queryKey: ["patient-plan", planId],

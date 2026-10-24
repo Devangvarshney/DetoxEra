@@ -19,6 +19,25 @@ export interface HospitalDoctor {
   coords: { x: number; y: number }; // percentage on map canvas (0-100)
   therapies: string[];
   mapQuery: string;
+  clinics?: Array<{
+    id?: number;
+    clinic_name: string;
+    clinic_address: string;
+    city?: string;
+    timing?: string;
+    fee?: string;
+    phone?: string;
+    is_primary?: boolean;
+  }>;
+  reviews?: Array<{
+    id?: number;
+    rating: number;
+    review_text?: string;
+    patient_name?: string;
+    clinic_name?: string;
+    clinic_address?: string;
+    created_at?: string;
+  }>;
 }
 
 export interface CityData {

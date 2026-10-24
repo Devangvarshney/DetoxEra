@@ -488,6 +488,13 @@ DB_HOST=db.nxyzpcrieucfvckrsayc.supabase.co
 DB_PORT=5432
 DB_NAME=postgres
 
+# Supabase API Configuration
+SUPABASE_URL=https://nxyzpcrieucfvckrsayc.supabase.co
+SUPABASE_KEY=your_supabase_secret_key
+SUPABASE_PUBLISHABLE_KEY=sb_publishable_8mYuYdC0SDTnsolk8Bj1ZQ_-fhqSVNU
+SUPABASE_SECRET_KEY=your_supabase_secret_key
+SUPABASE_JWKS_URL=https://nxyzpcrieucfvckrsayc.supabase.co/auth/v1/.well-known/jwks.json
+
 # Or Direct MySQL / PostgreSQL Connection String
 DATABASE_URL=postgresql://postgres:[PASSWORD]@db.nxyzpcrieucfvckrsayc.supabase.co:5432/postgres
 
@@ -501,6 +508,9 @@ CORS_ORIGINS=http://localhost:3000,http://127.0.0.1:3000,capacitor://localhost
 ### Frontend (`ayursutra/ayursutra_frontend/.env.local`)
 ```ini
 NEXT_PUBLIC_API_URL=http://localhost:8000
+NEXT_PUBLIC_SUPABASE_URL=https://nxyzpcrieucfvckrsayc.supabase.co
+NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY=sb_publishable_8mYuYdC0SDTnsolk8Bj1ZQ_-fhqSVNU
+NEXT_PUBLIC_SUPABASE_ANON_KEY=sb_publishable_8mYuYdC0SDTnsolk8Bj1ZQ_-fhqSVNU
 NEXT_PUBLIC_GOOGLE_CLIENT_ID=[YOUR_GOOGLE_CLIENT_ID].apps.googleusercontent.com
 ```
 

@@ -8,13 +8,14 @@ import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useState } from "react";
-import { useParams } from "next/navigation";
+import { useParams, useSearchParams } from "next/navigation";
 import { Star } from "lucide-react";
 import { ProgressChart } from "@/components/shared/ProgressChart";
 
 export default function SessionsClient() {
   const params = useParams();
-  const planId = params?.id as string;
+  const searchParams = useSearchParams();
+  const planId = (params?.id as string) || searchParams?.get("id") || searchParams?.get("plan_id") || "";
   const queryClient = useQueryClient();
 
   const [schedulingSessionId, setSchedulingSessionId] = useState<number | null>(null);

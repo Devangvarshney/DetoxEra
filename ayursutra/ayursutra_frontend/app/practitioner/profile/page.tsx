@@ -28,8 +28,23 @@ import {
   Eye,
   ImageIcon,
   Navigation,
-  LocateFixed
+  LocateFixed,
+  Plus,
+  Trash2,
+  MessageSquare,
+  ThumbsUp
 } from "lucide-react";
+
+export interface ClinicAddressItem {
+  id?: string | number;
+  clinic_name: string;
+  clinic_address: string;
+  city?: string;
+  timing?: string;
+  phone?: string;
+  consultation_fee?: string;
+  is_primary?: boolean;
+}
 
 export default function PractitionerProfilePage() {
   const { user } = useAuth();
@@ -43,7 +58,8 @@ export default function PractitionerProfilePage() {
   const [experience, setExperience] = useState("");
   const [city, setCity] = useState("");
 
-  // Clinical & Public Visibility Setup
+  // Multiple Clinics & Addresses Setup
+  const [clinics, setClinics] = useState<ClinicAddressItem[]>([]);
   const [clinicName, setClinicName] = useState("");
   const [clinicAddress, setClinicAddress] = useState("");
   const [consultationFee, setConsultationFee] = useState("");
@@ -56,15 +72,17 @@ export default function PractitionerProfilePage() {
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [isLocating, setIsLocating] = useState<boolean>(false);
+  const [locatingClinicIndex, setLocatingClinicIndex] = useState<number | null>(null);
   const [locationStatus, setLocationStatus] = useState<string | null>(null);
 
-  const handleFetchLiveLocation = () => {
+  const handleFetchLiveLocation = (targetClinicIndex?: number) => {
     if (typeof window === "undefined" || !navigator.geolocation) {
       setErrorMessage("Geolocation is not supported by your browser or device.");
       return;
     }
 
     setIsLocating(true);
+    setLocatingClinicIndex(targetClinicIndex ?? null);
     setLocationStatus("Accessing GPS satellite / network location...");
     setErrorMessage(null);
 
@@ -114,9 +132,15 @@ export default function PractitionerProfilePage() {
 
           if (fullAddress) {
             setClinicAddress(fullAddress);
+            if (targetClinicIndex !== undefined && targetClinicIndex !== null) {
+              handleUpdateClinic(targetClinicIndex, "clinic_address", fullAddress);
+            }
           }
           if (detectedCity) {
             setCity(detectedCity);
+            if (targetClinicIndex !== undefined && targetClinicIndex !== null) {
+              handleUpdateClinic(targetClinicIndex, "city", detectedCity);
+            }
           }
 
           setLocationStatus(`Live location detected: ${detectedCity} (${fullAddress.slice(0, 40)}...)`);
@@ -136,8 +160,18 @@ export default function PractitionerProfilePage() {
               fbData.countryName || ""
             ].filter(Boolean).join(", ");
 
-            if (fbAddress) setClinicAddress(fbAddress);
-            if (fbCity) setCity(fbCity);
+            if (fbAddress) {
+              setClinicAddress(fbAddress);
+              if (targetClinicIndex !== undefined && targetClinicIndex !== null) {
+                handleUpdateClinic(targetClinicIndex, "clinic_address", fbAddress);
+              }
+            }
+            if (fbCity) {
+              setCity(fbCity);
+              if (targetClinicIndex !== undefined && targetClinicIndex !== null) {
+                handleUpdateClinic(targetClinicIndex, "city", fbCity);
+              }
+            }
             setLocationStatus(`Live location detected: ${fbCity}`);
             setTimeout(() => setLocationStatus(null), 5000);
           } catch {
@@ -145,10 +179,12 @@ export default function PractitionerProfilePage() {
           }
         } finally {
           setIsLocating(false);
+          setLocatingClinicIndex(null);
         }
       },
       (err) => {
         setIsLocating(false);
+        setLocatingClinicIndex(null);
         setLocationStatus(null);
         if (err.code === 1) {
           setErrorMessage("Location permission was denied. Please allow location access in your device settings.");
@@ -168,12 +204,68 @@ export default function PractitionerProfilePage() {
     );
   };
 
+  const handleAddClinic = () => {
+    setClinics((prev) => [
+      ...prev,
+      {
+        id: `clinic-${Date.now()}`,
+        clinic_name: "",
+        clinic_address: "",
+        city: city || "",
+        timing: "Open now · Closes 8:00 PM",
+        phone: phone || "",
+        consultation_fee: consultationFee || "₹700",
+        is_primary: prev.length === 0,
+      },
+    ]);
+  };
+
+  const handleRemoveClinic = (index: number) => {
+    if (clinics.length <= 1) return;
+    setClinics((prev) => prev.filter((_, idx) => idx !== index));
+  };
+
+  const handleUpdateClinic = (index: number, field: keyof ClinicAddressItem, value: any) => {
+    setClinics((prev) => {
+      const updated = [...prev];
+      if (updated[index]) {
+        updated[index] = { ...updated[index], [field]: value };
+      }
+      return updated;
+    });
+
+    // Keep primary clinic synced with top-level fields
+    if (index === 0) {
+      if (field === "clinic_name") setClinicName(value);
+      if (field === "clinic_address") setClinicAddress(value);
+      if (field === "city") setCity(value);
+      if (field === "timing") setTiming(value);
+      if (field === "phone") setPhone(value);
+      if (field === "consultation_fee") setConsultationFee(value);
+    }
+  };
+
   const { data: profile, isLoading } = useQuery({
     queryKey: ["practitioner-profile"],
     queryFn: async () => {
       const res = await api.get("/practitioners/me/profile");
       return res.data;
     },
+  });
+
+  // Query reviews & feedback with stars for this doctor
+  const { data: practitionerReviews = [] } = useQuery({
+    queryKey: ["practitioner-reviews", profile?.id],
+    queryFn: async () => {
+      if (!profile?.id) return [];
+      try {
+        const res = await api.get(`/practitioners/${profile.id}/reviews`);
+        return res.data;
+      } catch {
+        return [];
+      }
+    },
+    enabled: !!profile?.id,
   });
 
   useEffect(() => {
@@ -191,6 +283,35 @@ export default function PractitionerProfilePage() {
       setTherapies(profile.therapies || "");
       setProfileImage(profile.profile_image || "");
       setTiming(profile.timing || "");
+
+      // Multiple Clinics initialization
+      if (profile.clinics && profile.clinics.length > 0) {
+        setClinics(profile.clinics);
+      } else if (profile.clinic_name || profile.clinic_address) {
+        setClinics([
+          {
+            clinic_name: profile.clinic_name || "",
+            clinic_address: profile.clinic_address || "",
+            city: profile.city || "",
+            timing: profile.timing || "Open now · Closes 8:00 PM",
+            phone: profile.phone || "",
+            consultation_fee: profile.consultation_fee || "₹700",
+            is_primary: true,
+          },
+        ]);
+      } else {
+        setClinics([
+          {
+            clinic_name: "",
+            clinic_address: "",
+            city: profile.city || "",
+            timing: "Open now · Closes 8:00 PM",
+            phone: "",
+            consultation_fee: "₹700",
+            is_primary: true,
+          },
+        ]);
+      }
     }
   }, [profile]);
 
@@ -203,7 +324,7 @@ export default function PractitionerProfilePage() {
       queryClient.invalidateQueries({ queryKey: ["practitioner-profile"] });
       queryClient.invalidateQueries({ queryKey: ["practitioners"] });
       setIsEditing(false);
-      setSuccessMessage("Profile & Clinic details updated! You are now visible to patients.");
+      setSuccessMessage("Profile & Clinic addresses updated! You are now visible to patients.");
       setErrorMessage(null);
       setTimeout(() => setSuccessMessage(null), 4500);
     },
@@ -217,24 +338,46 @@ export default function PractitionerProfilePage() {
     e.preventDefault();
     setErrorMessage(null);
 
-    // If clinic details are filled, mark completed
-    const hasClinicDetails = Boolean(clinicName.trim() && clinicAddress.trim());
+    const primary = clinics[0] || {
+      clinic_name: clinicName,
+      clinic_address: clinicAddress,
+      city,
+      consultation_fee: consultationFee,
+      phone,
+      timing,
+    };
+
+    const hasClinicDetails = Boolean(
+      (primary.clinic_name && primary.clinic_name.trim()) &&
+      (primary.clinic_address && primary.clinic_address.trim())
+    );
 
     updateMutation.mutate({
       name: name.trim(),
       specialization: specialization.trim(),
       qualification: qualification.trim(),
       experience: experience.trim(),
-      city: city.trim(),
-      clinic_name: clinicName.trim(),
-      clinic_address: clinicAddress.trim(),
-      consultation_fee: consultationFee.trim(),
-      phone: phone.trim(),
+      city: (primary.city || city).trim(),
+      clinic_name: (primary.clinic_name || clinicName).trim(),
+      clinic_address: (primary.clinic_address || clinicAddress).trim(),
+      consultation_fee: (primary.consultation_fee || consultationFee).trim(),
+      phone: (primary.phone || phone).trim(),
       accreditation: accreditation.trim(),
       therapies: therapies.trim(),
       profile_image: profileImage.trim(),
-      timing: timing.trim(),
+      timing: (primary.timing || timing).trim(),
       is_profile_completed: hasClinicDetails,
+      clinics: clinics
+        .filter((c) => c.clinic_name?.trim() || c.clinic_address?.trim())
+        .map((c, idx) => ({
+          clinic_name: c.clinic_name.trim(),
+          clinic_address: c.clinic_address.trim(),
+          city: (c.city || primary.city || city).trim(),
+          timing: (c.timing || primary.timing || timing).trim(),
+          phone: (c.phone || primary.phone || phone).trim(),
+          consultation_fee: (c.consultation_fee || primary.consultation_fee || consultationFee).trim(),
+          is_primary: idx === 0 || Boolean(c.is_primary),
+        })),
     });
   };
 
@@ -443,7 +586,7 @@ export default function PractitionerProfilePage() {
                       <label className="text-xs font-semibold text-gray-700">City / Region *</label>
                       <button
                         type="button"
-                        onClick={handleFetchLiveLocation}
+                        onClick={() => handleFetchLiveLocation()}
                         disabled={isLocating}
                         className="text-[11px] font-semibold text-[#1E7E34] hover:underline flex items-center gap-1 cursor-pointer disabled:opacity-60"
                       >
@@ -462,97 +605,179 @@ export default function PractitionerProfilePage() {
                 </div>
               </div>
 
-              {/* SECTION 2: Clinic & Hospital Setup (Needed for Patient Screen) */}
+              {/* SECTION 2: Clinic & Hospital Setup (Doctors can have multiple addresses!) */}
               <div className="space-y-4 pt-2">
-                <div className="flex items-center gap-2 pb-2 border-b border-gray-200">
-                  <Building2 className="w-4 h-4 text-[#1E7E34]" />
-                  <h3 className="font-bold text-sm text-gray-900 uppercase tracking-wide">
-                    2. Clinic & Hospital Details (Visible to Patients)
-                  </h3>
+                <div className="flex items-center justify-between pb-2 border-b border-gray-200">
+                  <div className="flex items-center gap-2">
+                    <Building2 className="w-4 h-4 text-[#1E7E34]" />
+                    <h3 className="font-bold text-sm text-gray-900 uppercase tracking-wide">
+                      2. Clinic Locations & Addresses ({clinics.length})
+                    </h3>
+                  </div>
+
+                  {/* PLUS SIGN BUTTON FOR MULTIPLE CLINICS */}
+                  <button
+                    type="button"
+                    onClick={handleAddClinic}
+                    className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold shadow-xs hover:shadow-md transition-all cursor-pointer"
+                    title="Add another clinic or hospital address"
+                  >
+                    <Plus className="w-4 h-4" />
+                    <span>Add Clinic / Address</span>
+                  </button>
                 </div>
 
                 <div className="p-3 bg-emerald-50/60 border border-emerald-200 rounded-xl text-xs text-emerald-800 flex items-start gap-2">
                   <Sparkles className="w-4 h-4 text-emerald-600 shrink-0 mt-0.5" />
                   <span>
-                    These details will be shown to patients searching for Ayurvedic centers in your city.
+                    Doctors can practice across multiple locations. Click the <strong>&quot;+ Add Clinic / Address&quot;</strong> button to add each of your clinics or consulting hospitals.
                   </span>
                 </div>
 
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                  <div className="space-y-1 sm:col-span-2">
-                    <label className="text-xs font-semibold text-gray-700">Clinic / Hospital Name *</label>
-                    <Input
-                      required
-                      placeholder="e.g. Kerala Ayurveda Life Center / Sanjeevani Ayurveda Clinic"
-                      value={clinicName}
-                      onChange={(e) => setClinicName(e.target.value)}
-                      className="rounded-xl text-xs h-10"
-                    />
+                {locationStatus && (
+                  <div className="p-2.5 rounded-xl bg-emerald-50 border border-emerald-200 text-xs text-emerald-800 flex items-center gap-2 animate-fade-in">
+                    <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
+                    <span className="font-medium">{locationStatus}</span>
                   </div>
+                )}
 
-                  <div className="space-y-1.5 sm:col-span-2">
-                    <div className="flex items-center justify-between gap-2">
-                      <label className="text-xs font-semibold text-gray-700">Clinic Full Address *</label>
-                      <button
-                        type="button"
-                        onClick={handleFetchLiveLocation}
-                        disabled={isLocating}
-                        className="inline-flex items-center gap-1.5 px-3 py-1 rounded-xl bg-emerald-50 hover:bg-emerald-100 text-[#1E7E34] text-xs font-bold border border-emerald-300 transition-all shadow-2xs cursor-pointer disabled:opacity-60"
-                      >
-                        {isLocating ? (
-                          <>
-                            <span className="w-3.5 h-3.5 border-2 border-emerald-700 border-t-transparent rounded-full animate-spin" />
-                            <span>Detecting GPS Location...</span>
-                          </>
-                        ) : (
-                          <>
-                            <Navigation className="w-3.5 h-3.5 text-emerald-600" />
-                            <span>Auto-Fill from Live GPS</span>
-                          </>
+                {/* DYNAMIC LIST OF CLINICS */}
+                <div className="space-y-4">
+                  {clinics.map((clinic, index) => (
+                    <div
+                      key={clinic.id || index}
+                      className="p-4 rounded-2xl border border-gray-200 bg-gray-50/60 space-y-3 relative shadow-2xs"
+                    >
+                      <div className="flex items-center justify-between pb-2 border-b border-gray-200">
+                        <div className="flex items-center gap-2">
+                          <span className={`px-2.5 py-0.5 rounded-full text-[11px] font-bold ${
+                            index === 0
+                              ? "bg-emerald-100 text-emerald-800 border border-emerald-300"
+                              : "bg-blue-100 text-blue-800 border border-blue-300"
+                          }`}>
+                            {index === 0 ? "Primary Clinic" : `Branch #${index + 1}`}
+                          </span>
+                          <span className="text-xs font-semibold text-gray-700">
+                            {clinic.clinic_name || `Location ${index + 1}`}
+                          </span>
+                        </div>
+
+                        {clinics.length > 1 && (
+                          <button
+                            type="button"
+                            onClick={() => handleRemoveClinic(index)}
+                            className="inline-flex items-center gap-1 text-xs text-red-600 hover:text-red-700 font-semibold px-2 py-1 rounded-lg hover:bg-red-50 transition-colors cursor-pointer"
+                          >
+                            <Trash2 className="w-3.5 h-3.5" />
+                            <span>Remove</span>
+                          </button>
                         )}
-                      </button>
-                    </div>
-
-                    {locationStatus && (
-                      <div className="p-2.5 rounded-xl bg-emerald-50 border border-emerald-200 text-xs text-emerald-800 flex items-center gap-2 animate-fade-in">
-                        <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
-                        <span className="font-medium">{locationStatus}</span>
                       </div>
-                    )}
 
-                    <Input
-                      required
-                      placeholder="e.g. DLF Phase 4, Golf Course Road, Gurugram, NCR"
-                      value={clinicAddress}
-                      onChange={(e) => setClinicAddress(e.target.value)}
-                      className="rounded-xl text-xs h-10"
-                    />
-                    <p className="text-[11px] text-gray-400">
-                      Tap &quot;Auto-Fill from Live GPS&quot; to fetch your exact clinic street address and city automatically.
-                    </p>
-                  </div>
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
+                        <div className="space-y-1 sm:col-span-2">
+                          <label className="text-xs font-semibold text-gray-700">
+                            Clinic / Hospital Name *
+                          </label>
+                          <Input
+                            required
+                            placeholder="e.g. Kerala Ayurveda Life Center"
+                            value={clinic.clinic_name}
+                            onChange={(e) => handleUpdateClinic(index, "clinic_name", e.target.value)}
+                            className="rounded-xl text-xs h-10 bg-white"
+                          />
+                        </div>
 
-                  <div className="space-y-1">
-                    <label className="text-xs font-semibold text-gray-700">Consultation Fee *</label>
-                    <Input
-                      required
-                      placeholder="e.g. ₹700 or ₹500"
-                      value={consultationFee}
-                      onChange={(e) => setConsultationFee(e.target.value)}
-                      className="rounded-xl text-xs h-10"
-                    />
-                  </div>
+                        <div className="space-y-1.5 sm:col-span-2">
+                          <div className="flex items-center justify-between gap-2">
+                            <label className="text-xs font-semibold text-gray-700">
+                              Clinic Full Street Address *
+                            </label>
+                            <button
+                              type="button"
+                              onClick={() => handleFetchLiveLocation(index)}
+                              disabled={isLocating}
+                              className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-emerald-50 hover:bg-emerald-100 text-[#1E7E34] text-[11px] font-bold border border-emerald-300 transition-all cursor-pointer disabled:opacity-60"
+                            >
+                              {isLocating && locatingClinicIndex === index ? (
+                                <>
+                                  <span className="w-3 h-3 border-2 border-emerald-700 border-t-transparent rounded-full animate-spin" />
+                                  <span>Detecting GPS...</span>
+                                </>
+                              ) : (
+                                <>
+                                  <Navigation className="w-3 h-3 text-emerald-600" />
+                                  <span>Auto-Fill GPS for this clinic</span>
+                                </>
+                              )}
+                            </button>
+                          </div>
 
-                  <div className="space-y-1">
-                    <label className="text-xs font-semibold text-gray-700">Contact Phone Number</label>
-                    <Input
-                      placeholder="e.g. +91 98112 34567"
-                      value={phone}
-                      onChange={(e) => setPhone(e.target.value)}
-                      className="rounded-xl text-xs h-10"
-                    />
-                  </div>
+                          <Input
+                            required
+                            placeholder="e.g. DLF Phase 4, Golf Course Road, Gurugram, NCR"
+                            value={clinic.clinic_address}
+                            onChange={(e) => handleUpdateClinic(index, "clinic_address", e.target.value)}
+                            className="rounded-xl text-xs h-10 bg-white"
+                          />
+                        </div>
 
+                        <div className="space-y-1">
+                          <label className="text-xs font-semibold text-gray-700">City / District</label>
+                          <Input
+                            placeholder="e.g. Gurugram / Delhi NCR"
+                            value={clinic.city || ""}
+                            onChange={(e) => handleUpdateClinic(index, "city", e.target.value)}
+                            className="rounded-xl text-xs h-10 bg-white"
+                          />
+                        </div>
+
+                        <div className="space-y-1">
+                          <label className="text-xs font-semibold text-gray-700">Consultation Fee</label>
+                          <Input
+                            placeholder="e.g. ₹700 or ₹500"
+                            value={clinic.consultation_fee || ""}
+                            onChange={(e) => handleUpdateClinic(index, "consultation_fee", e.target.value)}
+                            className="rounded-xl text-xs h-10 bg-white"
+                          />
+                        </div>
+
+                        <div className="space-y-1">
+                          <label className="text-xs font-semibold text-gray-700">Contact Phone</label>
+                          <Input
+                            placeholder="e.g. +91 98112 34567"
+                            value={clinic.phone || ""}
+                            onChange={(e) => handleUpdateClinic(index, "phone", e.target.value)}
+                            className="rounded-xl text-xs h-10 bg-white"
+                          />
+                        </div>
+
+                        <div className="space-y-1">
+                          <label className="text-xs font-semibold text-gray-700">Clinic Timings / Status</label>
+                          <Input
+                            placeholder="e.g. Open now · Closes 8:00 PM"
+                            value={clinic.timing || ""}
+                            onChange={(e) => handleUpdateClinic(index, "timing", e.target.value)}
+                            className="rounded-xl text-xs h-10 bg-white"
+                          />
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+
+                  {/* PLUS SIGN BUTTON (SECONDARY) */}
+                  <button
+                    type="button"
+                    onClick={handleAddClinic}
+                    className="w-full py-3 border-2 border-dashed border-emerald-300 hover:border-emerald-500 bg-emerald-50/40 hover:bg-emerald-50 text-emerald-800 rounded-2xl flex items-center justify-center gap-2 text-xs font-bold transition-all cursor-pointer shadow-2xs"
+                  >
+                    <Plus className="w-4 h-4 text-emerald-700" />
+                    <span>+ Add Another Clinic / Hospital Location</span>
+                  </button>
+                </div>
+
+                {/* Additional Profile Info */}
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-4 border-t border-gray-200">
                   <div className="space-y-1">
                     <label className="text-xs font-semibold text-gray-700">Accreditation / Certifications</label>
                     <Input
@@ -564,11 +789,11 @@ export default function PractitionerProfilePage() {
                   </div>
 
                   <div className="space-y-1">
-                    <label className="text-xs font-semibold text-gray-700">Clinic Timings / Status</label>
+                    <label className="text-xs font-semibold text-gray-700">Clinic / Doctor Photo URL</label>
                     <Input
-                      placeholder="e.g. Open now · Closes 8:00 PM"
-                      value={timing}
-                      onChange={(e) => setTiming(e.target.value)}
+                      placeholder="e.g. https://images.unsplash.com/photo-1629909613654-28e377c37b09?w=300"
+                      value={profileImage}
+                      onChange={(e) => setProfileImage(e.target.value)}
                       className="rounded-xl text-xs h-10"
                     />
                   </div>
@@ -579,16 +804,6 @@ export default function PractitionerProfilePage() {
                       placeholder="e.g. Vamana, Virechana, Basti, Nasya, Raktamokshana"
                       value={therapies}
                       onChange={(e) => setTherapies(e.target.value)}
-                      className="rounded-xl text-xs h-10"
-                    />
-                  </div>
-
-                  <div className="space-y-1 sm:col-span-2">
-                    <label className="text-xs font-semibold text-gray-700">Clinic / Doctor Photo URL</label>
-                    <Input
-                      placeholder="e.g. https://images.unsplash.com/photo-1629909613654-28e377c37b09?w=300"
-                      value={profileImage}
-                      onChange={(e) => setProfileImage(e.target.value)}
                       className="rounded-xl text-xs h-10"
                     />
                   </div>
@@ -656,81 +871,126 @@ export default function PractitionerProfilePage() {
                 </div>
               </div>
 
-              {/* SECTION 2: Clinic & Consultation Public Details */}
+              {/* SECTION 2: Multiple Clinic & Hospital Locations */}
               <div className="space-y-4">
                 <div className="flex items-center justify-between pb-2 border-b border-gray-100">
                   <div className="flex items-center gap-2">
                     <Building2 className="w-4 h-4 text-emerald-600" />
                     <h3 className="font-bold text-xs uppercase tracking-wider text-gray-700">
-                      Clinic & Consultation Setup
+                      Clinic Locations & Addresses ({clinics.length > 0 ? clinics.length : isProfileComplete ? 1 : 0})
                     </h3>
                   </div>
 
-                  <span className={`text-[11px] font-semibold px-2 py-0.5 rounded-md ${
-                    isProfileComplete ? "bg-emerald-100 text-emerald-800" : "bg-amber-100 text-amber-800"
-                  }`}>
-                    {isProfileComplete ? "Publicly Listed" : "Unlisted (Fill Details)"}
-                  </span>
+                  <div className="flex items-center gap-2">
+                    <span className={`text-[11px] font-semibold px-2 py-0.5 rounded-md ${
+                      isProfileComplete ? "bg-emerald-100 text-emerald-800" : "bg-amber-100 text-amber-800"
+                    }`}>
+                      {isProfileComplete ? "Publicly Listed" : "Unlisted (Fill Details)"}
+                    </span>
+
+                    {/* PLUS SIGN QUICK ADD BUTTON */}
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      onClick={() => {
+                        handleAddClinic();
+                        setIsEditing(true);
+                      }}
+                      className="text-xs h-7 rounded-lg border-emerald-600 text-emerald-700 hover:bg-emerald-50 font-bold flex items-center gap-1 cursor-pointer"
+                    >
+                      <Plus className="w-3.5 h-3.5" />
+                      <span>Add Clinic</span>
+                    </Button>
+                  </div>
                 </div>
 
                 {isProfileComplete ? (
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                    <div className="p-4 rounded-2xl bg-gray-50 border border-gray-200 space-y-1">
-                      <span className="text-[11px] font-bold text-gray-400 uppercase block">Clinic Name</span>
-                      <p className="text-sm font-bold text-gray-900">{clinicName}</p>
-                    </div>
-
-                    <div className="p-4 rounded-2xl bg-gray-50 border border-gray-200 space-y-1">
-                      <span className="text-[11px] font-bold text-gray-400 uppercase block">Consultation Fee</span>
-                      <p className="text-sm font-bold text-emerald-800">{consultationFee || "₹700"}</p>
-                    </div>
-
-                    <div className="p-4 rounded-2xl bg-gray-50 border border-gray-200 space-y-1 sm:col-span-2">
-                      <span className="text-[11px] font-bold text-gray-400 uppercase block">Full Address</span>
-                      <p className="text-xs text-gray-700 flex items-center gap-1.5">
-                        <MapPin className="w-3.5 h-3.5 text-red-500 shrink-0" />
-                        <span>{clinicAddress} ({city})</span>
-                      </p>
-                    </div>
-
-                    {phone && (
-                      <div className="p-4 rounded-2xl bg-gray-50 border border-gray-200 space-y-1">
-                        <span className="text-[11px] font-bold text-gray-400 uppercase block">Phone</span>
-                        <p className="text-xs text-gray-700">{phone}</p>
-                      </div>
-                    )}
-
-                    {timing && (
-                      <div className="p-4 rounded-2xl bg-gray-50 border border-gray-200 space-y-1">
-                        <span className="text-[11px] font-bold text-gray-400 uppercase block">Timing</span>
-                        <p className="text-xs text-gray-700">{timing}</p>
-                      </div>
-                    )}
-
-                    {accreditation && (
-                      <div className="p-4 rounded-2xl bg-gray-50 border border-gray-200 space-y-1 sm:col-span-2">
-                        <span className="text-[11px] font-bold text-gray-400 uppercase block">Accreditation</span>
-                        <p className="text-xs text-emerald-700 font-medium">{accreditation}</p>
-                      </div>
-                    )}
-
-                    {therapies && (
-                      <div className="p-4 rounded-2xl bg-gray-50 border border-gray-200 space-y-1 sm:col-span-2">
-                        <span className="text-[11px] font-bold text-gray-400 uppercase block">Available Therapies</span>
-                        <div className="flex flex-wrap gap-1.5 mt-1">
-                          {therapies.split(",").map((t, idx) => (
-                            <span key={idx} className="px-2 py-0.5 rounded-lg bg-emerald-50 text-emerald-800 border border-emerald-200 text-[11px] font-medium">
-                              {t.trim()}
+                  <div className="space-y-3">
+                    {/* Render each clinic card */}
+                    {(clinics.length > 0 ? clinics : [{
+                      clinic_name: clinicName,
+                      clinic_address: clinicAddress,
+                      city,
+                      consultation_fee: consultationFee,
+                      phone,
+                      timing,
+                      is_primary: true
+                    }]).map((c, idx) => (
+                      <div
+                        key={c.id || idx}
+                        className="p-4 rounded-2xl bg-gray-50/80 border border-gray-200 space-y-3"
+                      >
+                        <div className="flex items-center justify-between">
+                          <div className="flex items-center gap-2">
+                            <span className={`px-2 py-0.5 rounded-md text-[10px] font-bold uppercase tracking-wider ${
+                              idx === 0
+                                ? "bg-emerald-100 text-emerald-800 border border-emerald-300"
+                                : "bg-blue-100 text-blue-800 border border-blue-300"
+                            }`}>
+                              {idx === 0 ? "Primary Clinic" : `Branch #${idx + 1}`}
                             </span>
-                          ))}
+                            <h4 className="text-sm font-bold text-gray-900">
+                              {c.clinic_name || clinicName}
+                            </h4>
+                          </div>
+
+                          <span className="text-xs font-bold text-emerald-800 bg-white px-2.5 py-1 rounded-lg border border-emerald-200">
+                            Fee: {c.consultation_fee || consultationFee || "₹700"}
+                          </span>
+                        </div>
+
+                        <div className="text-xs text-gray-700 flex items-start gap-1.5 bg-white p-2.5 rounded-xl border border-gray-100">
+                          <MapPin className="w-3.5 h-3.5 text-red-500 shrink-0 mt-0.5" />
+                          <span className="font-medium">
+                            {c.clinic_address || clinicAddress} {c.city ? `(${c.city})` : city ? `(${city})` : ""}
+                          </span>
+                        </div>
+
+                        <div className="flex flex-wrap items-center gap-4 text-xs text-gray-600 pt-1">
+                          {(c.phone || phone) && (
+                            <span className="flex items-center gap-1.5">
+                              <Phone className="w-3.5 h-3.5 text-gray-400" />
+                              <span>{c.phone || phone}</span>
+                            </span>
+                          )}
+
+                          {(c.timing || timing) && (
+                            <span className="flex items-center gap-1.5">
+                              <Clock className="w-3.5 h-3.5 text-gray-400" />
+                              <span>{c.timing || timing}</span>
+                            </span>
+                          )}
                         </div>
                       </div>
-                    )}
+                    ))}
+
+                    {/* Shared accreditation & therapies */}
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-2">
+                      {accreditation && (
+                        <div className="p-3.5 rounded-xl bg-gray-50 border border-gray-200 space-y-1">
+                          <span className="text-[11px] font-bold text-gray-400 uppercase block">Accreditation</span>
+                          <p className="text-xs text-emerald-700 font-medium">{accreditation}</p>
+                        </div>
+                      )}
+
+                      {therapies && (
+                        <div className="p-3.5 rounded-xl bg-gray-50 border border-gray-200 space-y-1 sm:col-span-2">
+                          <span className="text-[11px] font-bold text-gray-400 uppercase block">Available Therapies</span>
+                          <div className="flex flex-wrap gap-1.5 mt-1">
+                            {therapies.split(",").map((t, idx) => (
+                              <span key={idx} className="px-2 py-0.5 rounded-lg bg-emerald-50 text-emerald-800 border border-emerald-200 text-[11px] font-medium">
+                                {t.trim()}
+                              </span>
+                            ))}
+                          </div>
+                        </div>
+                      )}
+                    </div>
                   </div>
                 ) : (
                   <div className="p-6 rounded-2xl border-2 border-dashed border-amber-300 bg-amber-50/40 text-center space-y-3">
                     <p className="text-xs text-amber-800 max-w-md mx-auto">
-                      You haven&apos;t added your Clinic Name, Address, or Consultation Fee yet. Click <strong>Edit Profile</strong> to fill them out so patients can view your clinic on the map and request consultations!
+                      You haven&apos;t added your Clinic Name, Address, or Consultation Fee yet. Click <strong>Edit Profile</strong> or the <strong>+ Add Clinic</strong> button to fill them out so patients can view your clinic on the map and request consultations!
                     </p>
                     <Button
                       size="sm"
@@ -739,6 +999,84 @@ export default function PractitionerProfilePage() {
                     >
                       Fill Clinic Details
                     </Button>
+                  </div>
+                )}
+              </div>
+
+              {/* SECTION 4: Doctor Feedback & Patient Reviews (Stars & Reviews) */}
+              <div className="space-y-4 pt-4 border-t border-gray-100">
+                <div className="flex items-center justify-between pb-2 border-b border-gray-100">
+                  <div className="flex items-center gap-2">
+                    <Star className="w-4 h-4 text-amber-500 fill-amber-500" />
+                    <h3 className="font-bold text-xs uppercase tracking-wider text-gray-700">
+                      Patient Feedback & Reviews ({practitionerReviews.length})
+                    </h3>
+                  </div>
+
+                  {practitionerReviews.length > 0 && (
+                    <div className="flex items-center gap-1.5 bg-amber-50 border border-amber-200 px-2.5 py-0.5 rounded-full text-xs font-bold text-amber-900">
+                      <span>
+                        {(
+                          practitionerReviews.reduce((acc: number, r: any) => acc + (r.rating || 5), 0) /
+                          practitionerReviews.length
+                        ).toFixed(1)}
+                      </span>
+                      <Star className="w-3.5 h-3.5 text-amber-500 fill-amber-500" />
+                      <span className="text-gray-400 font-normal">({practitionerReviews.length} reviews)</span>
+                    </div>
+                  )}
+                </div>
+
+                {practitionerReviews.length > 0 ? (
+                  <div className="space-y-3">
+                    {practitionerReviews.map((rev: any, idx: number) => (
+                      <div
+                        key={rev.id || idx}
+                        className="p-3.5 rounded-xl border border-gray-200 bg-white shadow-2xs space-y-2"
+                      >
+                        <div className="flex items-center justify-between text-xs">
+                          <div className="flex items-center gap-2">
+                            <span className="font-bold text-gray-900">{rev.patient_name || "Verified Patient"}</span>
+                            <span className="text-[10px] bg-emerald-50 text-emerald-700 border border-emerald-200 px-1.5 py-0.5 rounded font-medium">
+                              Verified
+                            </span>
+                          </div>
+
+                          <div className="flex items-center gap-1">
+                            {[1, 2, 3, 4, 5].map((star) => (
+                              <Star
+                                key={star}
+                                className={`w-3.5 h-3.5 ${
+                                  star <= (rev.rating || 5)
+                                    ? "text-amber-500 fill-amber-500"
+                                    : "text-gray-300"
+                                }`}
+                              />
+                            ))}
+                          </div>
+                        </div>
+
+                        <p className="text-xs text-gray-700 leading-relaxed italic">
+                          &ldquo;{rev.review || rev.comments || "Great consultation and therapy experience!"}&rdquo;
+                        </p>
+
+                        <div className="flex items-center justify-between text-[11px] text-gray-400 pt-1 border-t border-gray-50">
+                          <span>
+                            {rev.clinic_name || clinicName ? `Visited: ${rev.clinic_name || clinicName}` : "Ayurvedic Consultation"}
+                          </span>
+                          <span>
+                            {rev.created_at ? new Date(rev.created_at).toLocaleDateString() : "Recent"}
+                          </span>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                ) : (
+                  <div className="p-4 rounded-xl bg-gray-50 border border-gray-200 text-center space-y-1">
+                    <p className="text-xs font-semibold text-gray-700">No Patient Reviews Yet</p>
+                    <p className="text-[11px] text-gray-500">
+                      When patients complete therapy sessions or visit your clinics, their star ratings and written reviews will appear here.
+                    </p>
                   </div>
                 )}
               </div>
