@@ -92,56 +92,57 @@ export default function PatientPractitionersPage() {
       const rawClinics: ClinicItem[] = (p.clinics && p.clinics.length > 0)
         ? p.clinics.map((c: any) => ({
             id: c.id,
-            clinic_name: c.clinic_name || p.clinic_name || `${p.name}'s Ayurvedic Center`,
-            clinic_address: c.clinic_address || p.clinic_address || p.city || "Clinic Location",
+            clinic_name: c.clinic_name || p.clinic_name || "",
+            clinic_address: c.clinic_address || p.clinic_address || "",
             city: c.city || p.city || "",
-            timing: c.timing || p.timing || "Open daily · 9:00 AM - 8:00 PM",
-            phone: c.phone || p.phone || "+91 98112 34567",
-            consultation_fee: c.consultation_fee || p.consultation_fee || "₹700",
-            fee: c.consultation_fee || p.consultation_fee || "₹700",
+            timing: c.timing || p.timing || "",
+            phone: c.phone || p.phone || "",
+            consultation_fee: c.consultation_fee || p.consultation_fee || "",
+            fee: c.consultation_fee || p.consultation_fee || "",
             is_primary: Boolean(c.is_primary),
           }))
         : (p.clinic_name || p.clinic_address)
         ? [{
-            clinic_name: p.clinic_name,
-            clinic_address: p.clinic_address || p.city || "Clinic Location",
+            clinic_name: p.clinic_name || "",
+            clinic_address: p.clinic_address || "",
             city: p.city || "",
-            timing: p.timing || "Open daily · 9:00 AM - 8:00 PM",
-            phone: p.phone || "+91 98112 34567",
-            consultation_fee: p.consultation_fee || "₹700",
-            fee: p.consultation_fee || "₹700",
+            timing: p.timing || "",
+            phone: p.phone || "",
+            consultation_fee: p.consultation_fee || "",
+            fee: p.consultation_fee || "",
             is_primary: true,
           }]
         : [];
 
       const reviews = p.reviews || [];
-      const avgRating = reviews.length > 0
+      const hasReviews = reviews.length > 0;
+      const avgRating = hasReviews
         ? Number((reviews.reduce((acc: number, r: any) => acc + (r.rating || 5), 0) / reviews.length).toFixed(1))
-        : 4.9;
+        : null;
 
-      const formattedDoctorName = p.name ? (p.name.startsWith("Dr.") ? p.name : `Dr. ${p.name}`) : "Dr. Ayurvedic Vaidya";
+      const formattedDoctorName = p.name ? (p.name.startsWith("Dr.") ? p.name : `Dr. ${p.name}`) : "Ayurvedic Practitioner";
 
       return {
         id: p.id,
         practitionerDbId: p.id,
         doctorName: formattedDoctorName,
         name: rawClinics[0]?.clinic_name || p.clinic_name || `${formattedDoctorName}'s Clinic`,
-        qualification: p.qualification || "BAMS",
-        specialization: p.specialization || "Ayurveda & Panchakarma",
-        experience: p.experience ? (p.experience.includes("year") ? p.experience : `${p.experience} years exp.`) : "Certified Doctor",
-        city: p.city || rawClinics[0]?.city || "India",
-        fee: rawClinics[0]?.consultation_fee || p.consultation_fee || "₹700",
-        consultation_fee: rawClinics[0]?.consultation_fee || p.consultation_fee || "₹700",
+        qualification: p.qualification || "",
+        specialization: p.specialization || "Ayurveda",
+        experience: p.experience ? (p.experience.includes("year") ? p.experience : `${p.experience} years exp.`) : "",
+        city: p.city || rawClinics[0]?.city || "",
+        fee: rawClinics[0]?.consultation_fee || p.consultation_fee || "",
+        consultation_fee: rawClinics[0]?.consultation_fee || p.consultation_fee || "",
         phone: rawClinics[0]?.phone || p.phone || "",
-        timing: rawClinics[0]?.timing || p.timing || "Open daily · 9:00 AM - 8:00 PM",
+        timing: rawClinics[0]?.timing || p.timing || "",
         clinics: rawClinics,
-        cghsStatus: p.accreditation || "NABH Accredited · Ayush Certified",
+        cghsStatus: p.accreditation || null,
         image: p.profile_image || "https://images.unsplash.com/photo-1622253692010-333f2da6031d?w=400&auto=format&fit=crop&q=80",
         is_profile_completed: Boolean(p.is_profile_completed || (p.clinic_name && p.clinic_address)),
         rating: avgRating,
-        reviewsCount: reviews.length > 0 ? reviews.length : 12,
+        reviewsCount: reviews.length,
         reviews: reviews,
-        therapies: p.therapies ? p.therapies.split(",").map((s: string) => s.trim()) : ["Vamana", "Virechana", "Basti", "Nasya"],
+        therapies: p.therapies ? p.therapies.split(",").map((s: string) => s.trim()).filter(Boolean) : [],
       };
     });
   }, [dbPractitioners]);
@@ -239,13 +240,15 @@ export default function PatientPractitionersPage() {
       if (!reviewModalDoctor) return;
       const targetDbId = reviewModalDoctor.practitionerDbId || Number(reviewModalDoctor.id);
 
+      const commentText = reviewComment.trim();
       const payload = {
         practitioner_id: targetDbId,
-        patient_name: patientReviewerName.trim() || user?.name || "Verified Patient",
+        patient_name: patientReviewerName.trim() || user?.name || "Patient",
         rating: ratingScore,
-        review_text: reviewComment.trim() || "Excellent practitioner consultation and clinical care.",
-        clinic_name: reviewModalDoctor.name,
-        clinic_address: selectedClinicAddressForReview || reviewModalDoctor.clinics?.[0]?.clinic_address || reviewModalDoctor.city || "Clinic Location",
+        review_text: commentText || "",
+        review: commentText || "",
+        clinic_name: reviewModalDoctor.name || null,
+        clinic_address: selectedClinicAddressForReview || reviewModalDoctor.clinics?.[0]?.clinic_address || reviewModalDoctor.city || null,
       };
 
       try {
@@ -536,14 +539,31 @@ export default function PatientPractitionersPage() {
                         className="flex items-center gap-1 hover:underline text-left cursor-pointer"
                         title="Click to view reviews"
                       >
-                        <span className="font-bold text-gray-900">{doc.rating}</span>
-                        <Star className="w-3.5 h-3.5 text-amber-500 fill-amber-500" />
-                        <span className="text-gray-500 text-[11px]">({doc.reviewsCount} reviews)</span>
+                        {doc.rating !== null && Boolean(doc.reviewsCount && doc.reviewsCount > 0) ? (
+                          <>
+                            <span className="font-bold text-gray-900">{doc.rating}</span>
+                            <Star className="w-3.5 h-3.5 text-amber-500 fill-amber-500" />
+                            <span className="text-gray-500 text-[11px]">
+                              ({doc.reviewsCount} {doc.reviewsCount === 1 ? "review" : "reviews"})
+                            </span>
+                          </>
+                        ) : (
+                          <span className="text-gray-400 text-[11px] font-medium flex items-center gap-1">
+                            <Star className="w-3.5 h-3.5 text-gray-300" />
+                            <span>No ratings yet</span>
+                          </span>
+                        )}
                       </button>
 
-                      <span className="text-[10px] font-semibold text-emerald-800 bg-emerald-100/70 px-2 py-0.5 rounded-full truncate max-w-[140px]">
-                        {doc.cghsStatus || "NABH Verified"}
-                      </span>
+                      {doc.cghsStatus ? (
+                        <span className="text-[10px] font-semibold text-emerald-800 bg-emerald-100/70 px-2 py-0.5 rounded-full truncate max-w-[140px]">
+                          {doc.cghsStatus}
+                        </span>
+                      ) : (
+                        <span className="text-[10px] font-medium text-gray-400 bg-gray-100 px-2 py-0.5 rounded-full">
+                          Ayush Practitioner
+                        </span>
+                      )}
                     </div>
 
                     {/* Primary Clinic Card Box */}
@@ -568,18 +588,22 @@ export default function PatientPractitionersPage() {
                           </span>
                         </p>
 
-                        <div className="flex items-center justify-between text-[10px] text-gray-500 pt-1 border-t border-emerald-100/60">
-                          <span className="flex items-center gap-1">
-                            <Clock className="w-3 h-3 text-gray-400" />
-                            {primaryClinic?.timing || doc.timing}
-                          </span>
-                          {primaryClinic?.phone && (
-                            <span className="flex items-center gap-1 font-semibold text-emerald-800">
-                              <Phone className="w-2.5 h-2.5" />
-                              {primaryClinic.phone}
-                            </span>
-                          )}
-                        </div>
+                        {(primaryClinic?.timing || doc.timing || primaryClinic?.phone) && (
+                          <div className="flex items-center justify-between text-[10px] text-gray-500 pt-1 border-t border-emerald-100/60">
+                            {primaryClinic?.timing || doc.timing ? (
+                              <span className="flex items-center gap-1">
+                                <Clock className="w-3 h-3 text-gray-400" />
+                                {primaryClinic?.timing || doc.timing}
+                              </span>
+                            ) : <span />}
+                            {primaryClinic?.phone && (
+                              <span className="flex items-center gap-1 font-semibold text-emerald-800">
+                                <Phone className="w-2.5 h-2.5" />
+                                {primaryClinic.phone}
+                              </span>
+                            )}
+                          </div>
+                        )}
                       </div>
                     ) : (
                       <div className="p-3 rounded-2xl bg-amber-50/60 border border-amber-200 text-xs text-amber-800 flex items-start gap-2">
@@ -711,10 +735,16 @@ export default function PatientPractitionersPage() {
 
       {/* ─── Treatment Request Dialog Modal ─── */}
       {modalDoctor && (
-        <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4">
-          <div className="bg-white rounded-3xl max-w-lg w-full shadow-2xl border border-ayur-border overflow-hidden animate-scale-in">
+        <div
+          className="fixed inset-0 z-[100] bg-black/75 backdrop-blur-sm flex items-center justify-center p-3 sm:p-4 overflow-y-auto animate-fade-in"
+          onClick={() => setModalDoctor(null)}
+        >
+          <div
+            className="bg-white rounded-2xl sm:rounded-3xl max-w-lg w-full shadow-2xl border border-ayur-border overflow-hidden animate-scale-in max-h-[calc(100dvh-2rem)] flex flex-col my-auto"
+            onClick={(e) => e.stopPropagation()}
+          >
             {/* Modal Header */}
-            <div className="hero-gradient p-6 text-white relative">
+            <div className="hero-gradient p-5 sm:p-6 text-white relative shrink-0">
               <button
                 type="button"
                 onClick={() => setModalDoctor(null)}
@@ -732,7 +762,7 @@ export default function PatientPractitionersPage() {
             </div>
 
             {/* Modal Body */}
-            <div className="p-6 space-y-4">
+            <div className="p-4 sm:p-6 space-y-4 overflow-y-auto min-h-0 flex-1">
               {requestSuccess ? (
                 <div className="py-8 text-center space-y-3 animate-fade-in">
                   <div className="w-14 h-14 rounded-full bg-emerald-100 text-emerald-600 flex items-center justify-center mx-auto shadow-sm">
@@ -857,10 +887,16 @@ export default function PatientPractitionersPage() {
 
       {/* ─── Practitioner Reviews & Feedback Modal ─── */}
       {reviewModalDoctor && (
-        <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4">
-          <div className="bg-white rounded-3xl max-w-xl w-full shadow-2xl border border-ayur-border overflow-hidden animate-scale-in max-h-[90vh] flex flex-col">
+        <div
+          className="fixed inset-0 z-[100] bg-black/75 backdrop-blur-sm flex items-center justify-center p-3 sm:p-4 overflow-y-auto animate-fade-in"
+          onClick={() => setReviewModalDoctor(null)}
+        >
+          <div
+            className="bg-white rounded-2xl sm:rounded-3xl max-w-xl w-full shadow-2xl border border-ayur-border overflow-hidden animate-scale-in max-h-[calc(100dvh-2rem)] flex flex-col my-auto"
+            onClick={(e) => e.stopPropagation()}
+          >
             {/* Modal Header */}
-            <div className="hero-gradient p-6 text-white relative shrink-0">
+            <div className="hero-gradient p-5 sm:p-6 text-white relative shrink-0">
               <button
                 type="button"
                 onClick={() => setReviewModalDoctor(null)}
@@ -880,37 +916,61 @@ export default function PatientPractitionersPage() {
             {/* Modal Scrollable Content */}
             <div className="p-6 space-y-6 overflow-y-auto">
               {/* Rating Overview Card */}
-              <div className="bg-emerald-50/60 rounded-2xl p-4 border border-emerald-100 flex items-center justify-between">
-                <div>
-                  <span className="text-3xl font-outfit font-bold text-gray-900 leading-none">
-                    {reviewModalDoctor.rating}
-                  </span>
-                  <div className="flex items-center gap-1 mt-1">
-                    {[1, 2, 3, 4, 5].map((star) => (
-                      <Star
-                        key={star}
-                        className={`w-4 h-4 ${
-                          star <= Math.round(reviewModalDoctor.rating || 5)
-                            ? "text-amber-500 fill-amber-500"
-                            : "text-gray-300"
-                        }`}
-                      />
-                    ))}
+              {activeModalReviews && activeModalReviews.length > 0 ? (
+                <div className="bg-emerald-50/60 rounded-2xl p-4 border border-emerald-100 flex items-center justify-between">
+                  <div>
+                    <span className="text-3xl font-outfit font-bold text-gray-900 leading-none">
+                      {(
+                        activeModalReviews.reduce((acc: number, r: any) => acc + (r.rating || 5), 0) /
+                        activeModalReviews.length
+                      ).toFixed(1)}
+                    </span>
+                    <div className="flex items-center gap-1 mt-1">
+                      {[1, 2, 3, 4, 5].map((star) => (
+                        <Star
+                          key={star}
+                          className={`w-4 h-4 ${
+                            star <= Math.round(
+                              activeModalReviews.reduce((acc: number, r: any) => acc + (r.rating || 5), 0) /
+                              activeModalReviews.length
+                            )
+                              ? "text-amber-500 fill-amber-500"
+                              : "text-gray-300"
+                          }`}
+                        />
+                      ))}
+                    </div>
+                    <p className="text-[11px] text-gray-500 mt-1">
+                      Based on {activeModalReviews.length} {activeModalReviews.length === 1 ? "verified patient review" : "verified patient reviews"}
+                    </p>
                   </div>
-                  <p className="text-[11px] text-gray-500 mt-1">
-                    Based on {activeModalReviews?.length || reviewModalDoctor.reviewsCount} verified patient ratings
-                  </p>
-                </div>
 
-                <div className="text-right">
-                  <span className="inline-block px-3 py-1 rounded-full bg-emerald-100 text-emerald-800 text-xs font-bold">
-                    ✓ Verified Reviews
-                  </span>
-                  <p className="text-[11px] text-gray-500 mt-1">
-                    {reviewModalDoctor.cghsStatus}
-                  </p>
+                  <div className="text-right">
+                    <span className="inline-block px-3 py-1 rounded-full bg-emerald-100 text-emerald-800 text-xs font-bold">
+                      ✓ Verified Reviews
+                    </span>
+                    {reviewModalDoctor.cghsStatus && (
+                      <p className="text-[11px] text-gray-500 mt-1">
+                        {reviewModalDoctor.cghsStatus}
+                      </p>
+                    )}
+                  </div>
                 </div>
-              </div>
+              ) : (
+                <div className="bg-gray-50 rounded-2xl p-4 border border-dashed border-gray-200 flex items-center justify-between">
+                  <div>
+                    <span className="text-sm font-bold text-gray-700">No Patient Ratings Yet</span>
+                    <p className="text-[11px] text-gray-500 mt-0.5">
+                      Be the first to share your experience with {reviewModalDoctor.doctorName}!
+                    </p>
+                  </div>
+                  {reviewModalDoctor.cghsStatus && (
+                    <span className="inline-block px-2.5 py-1 rounded-full bg-emerald-100 text-emerald-800 text-[10px] font-bold">
+                      {reviewModalDoctor.cghsStatus}
+                    </span>
+                  )}
+                </div>
+              )}
 
               {/* Submit Feedback Form */}
               <div className="bg-white rounded-2xl p-4 border border-gray-200 shadow-2xs space-y-4">
@@ -1068,9 +1128,11 @@ export default function PatientPractitionersPage() {
                           </p>
                         )}
 
-                        <p className="text-gray-700 leading-relaxed text-xs">
-                          {rev.review_text || rev.comments || "Very knowledgeable doctor, pulse diagnosis was highly accurate."}
-                        </p>
+                        {rev.review_text || rev.review || rev.comments ? (
+                          <p className="text-gray-700 leading-relaxed text-xs">
+                            {rev.review_text || rev.review || rev.comments}
+                          </p>
+                        ) : null}
 
                         <p className="text-[10px] text-gray-400">
                           {rev.created_at ? new Date(rev.created_at).toLocaleDateString() : "Recent verified consultation"}

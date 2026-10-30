@@ -24,6 +24,7 @@ app.include_router(feedback.router, prefix="/feedback", tags=["Feedback"])
 app.include_router(notifications.router, prefix="/notifications", tags=["Notifications"])
 app.include_router(analytics.router, prefix="/analytics", tags=["Analytics"])
 app.include_router(milestones.router, prefix="/milestones", tags=["Milestones"])
+app.include_router(milestones.router, tags=["Milestones"])
 
 @app.on_event("startup")
 def startup_db_migration():

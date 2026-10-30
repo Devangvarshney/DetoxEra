@@ -26,7 +26,9 @@ def submit_feedback(db: Session, session_id: int, feedback_in: FeedbackCreate, p
         patient_id=patient_id,
         practitioner_id=db_session.therapy_plan.practitioner_id,
         rating=feedback_in.rating,
-        comments=feedback_in.comments
+        comments=feedback_in.comments,
+        symptoms_reported=feedback_in.symptoms_reported,
+        improvement_level=feedback_in.improvement_level
     )
     db.add(db_feedback)
     db.commit()

@@ -141,7 +141,7 @@ export function TherapyVideoPlayer({
           onClick={(e) => {
             if (e.target === e.currentTarget) setIsModalOpen(false);
           }}
-          className="fixed inset-0 z-50 bg-black/95 backdrop-blur-md flex flex-col items-center justify-center p-4 animate-scale-in"
+          className="fixed inset-0 z-[100] bg-black/95 backdrop-blur-md flex flex-col items-center justify-center p-4 animate-scale-in"
         >
           {/* Top modal bar */}
           <div className="w-full max-w-4xl flex items-center justify-between pb-3 text-white">

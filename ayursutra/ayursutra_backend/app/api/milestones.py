@@ -43,6 +43,7 @@ def create_milestone(
     db.refresh(db_milestone)
     return db_milestone
 
+@router.patch("/{milestone_id}/achieve", response_model=Milestone)
 @router.patch("/milestones/{milestone_id}/achieve", response_model=Milestone)
 def achieve_milestone(
     milestone_id: int,
@@ -61,6 +62,7 @@ def achieve_milestone(
     db.refresh(db_milestone)
     return db_milestone
 
+@router.delete("/{milestone_id}", status_code=status.HTTP_204_NO_CONTENT)
 @router.delete("/milestones/{milestone_id}", status_code=status.HTTP_204_NO_CONTENT)
 def delete_milestone(
     milestone_id: int,

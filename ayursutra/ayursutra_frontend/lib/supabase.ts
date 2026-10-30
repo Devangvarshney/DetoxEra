@@ -66,12 +66,14 @@ export async function getPractitionerReviews(practitionerId: number): Promise<Pr
  */
 export async function addPractitionerReview(review: PractitionerReviewRecord): Promise<PractitionerReviewRecord | null> {
   try {
+    const reviewContent = review.review || review.review_text || "";
     const payload = {
       practitioner_id: review.practitioner_id,
       patient_id: review.patient_id ?? null,
       patient_name: review.patient_name || "Verified Patient",
       rating: review.rating,
-      review_text: review.review_text || review.review || "",
+      review: reviewContent,
+      review_text: reviewContent,
       clinic_name: review.clinic_name || null,
       clinic_address: review.clinic_address || null,
     };

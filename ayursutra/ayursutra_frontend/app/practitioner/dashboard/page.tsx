@@ -273,9 +273,15 @@ export default function PractitionerDashboard() {
               <div className="mt-4 p-3 rounded-xl bg-ayur-green/5 border border-ayur-green/20">
                 <div className="flex items-center gap-2 mb-1">
                   <Star className="w-4 h-4 text-amber-500" />
-                  <span className="text-sm font-semibold text-ayur-green-dark">{analytics.overview.avg_rating.toFixed(1)} Rating</span>
+                  <span className="text-sm font-semibold text-ayur-green-dark">
+                    {analytics.overview.total_feedback > 0
+                      ? `${analytics.overview.avg_rating.toFixed(1)} Rating`
+                      : "No ratings yet"}
+                  </span>
                 </div>
-                <p className="text-xs text-ayur-muted">{analytics.overview.completion_rate}% completion rate · {analytics.overview.total_feedback} reviews</p>
+                <p className="text-xs text-ayur-muted">
+                  {analytics.overview.completion_rate}% completion rate · {analytics.overview.total_feedback} {analytics.overview.total_feedback === 1 ? "review" : "reviews"}
+                </p>
               </div>
             )}
           </CardContent>

@@ -214,7 +214,7 @@ export default function PractitionerProfilePage() {
         city: city || "",
         timing: "Open now · Closes 8:00 PM",
         phone: phone || "",
-        consultation_fee: consultationFee || "₹700",
+        consultation_fee: consultationFee || "",
         is_primary: prev.length === 0,
       },
     ]);
@@ -293,9 +293,9 @@ export default function PractitionerProfilePage() {
             clinic_name: profile.clinic_name || "",
             clinic_address: profile.clinic_address || "",
             city: profile.city || "",
-            timing: profile.timing || "Open now · Closes 8:00 PM",
+            timing: profile.timing || "",
             phone: profile.phone || "",
-            consultation_fee: profile.consultation_fee || "₹700",
+            consultation_fee: profile.consultation_fee || "",
             is_primary: true,
           },
         ]);
@@ -305,9 +305,9 @@ export default function PractitionerProfilePage() {
             clinic_name: "",
             clinic_address: "",
             city: profile.city || "",
-            timing: "Open now · Closes 8:00 PM",
+            timing: "",
             phone: "",
-            consultation_fee: "₹700",
+            consultation_fee: "",
             is_primary: true,
           },
         ]);
@@ -935,7 +935,7 @@ export default function PractitionerProfilePage() {
                           </div>
 
                           <span className="text-xs font-bold text-emerald-800 bg-white px-2.5 py-1 rounded-lg border border-emerald-200">
-                            Fee: {c.consultation_fee || consultationFee || "₹700"}
+                            Fee: {c.consultation_fee || consultationFee || "Not specified"}
                           </span>
                         </div>
 
@@ -1136,7 +1136,7 @@ export default function PractitionerProfilePage() {
 
                       <div className="text-right">
                         <span className="text-[11px] text-gray-500 block">Fee</span>
-                        <span className="font-bold text-gray-900">{consultationFee || "₹700"}</span>
+                        <span className="font-bold text-gray-900">{consultationFee || "Not specified"}</span>
                       </div>
                     </div>
 

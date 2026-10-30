@@ -102,12 +102,14 @@ def delete_practitioner_clinic(db: Session, practitioner_id: int, clinic_id: int
 
 def submit_practitioner_review(db: Session, practitioner_id: int, review_in: PractitionerReviewCreate, patient_id: Optional[int] = None) -> PractitionerReview:
     practitioner = get_practitioner(db, practitioner_id)
+    review_content = review_in.review or getattr(review_in, "review_text", None) or ""
     review = PractitionerReview(
         practitioner_id=practitioner.id,
         patient_id=patient_id,
-        patient_name=review_in.patient_name,
+        patient_name=review_in.patient_name or "Verified Patient",
         rating=review_in.rating,
-        review=review_in.review,
+        review=review_content,
+        review_text=review_content,
         clinic_name=review_in.clinic_name,
         clinic_address=review_in.clinic_address
     )

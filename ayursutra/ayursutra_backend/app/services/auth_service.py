@@ -81,10 +81,31 @@ def verify_google_id_token(credential: str) -> dict:
         id_info = id_token.verify_oauth2_token(
             credential,
             req,
-            settings.GOOGLE_CLIENT_ID if settings.GOOGLE_CLIENT_ID else None,
+            audience=None,
             clock_skew_in_seconds=60,
         )
+        
+        # Verify that the token audience matches our Google Cloud project's Client IDs
+        allowed_audiences = [
+            "348329351587-7a722sgnm0tlcfs3gotue709jspsi3ph.apps.googleusercontent.com",
+            "348329351587-tvff8ft02ih83jvsbe6fg21tgsdfkgvp.apps.googleusercontent.com",
+        ]
+        if settings.GOOGLE_CLIENT_ID:
+            for cid in settings.GOOGLE_CLIENT_ID.split(","):
+                c = cid.strip()
+                if c and c not in allowed_audiences:
+                    allowed_audiences.append(c)
+
+        token_aud = id_info.get("aud")
+        if allowed_audiences and token_aud not in allowed_audiences:
+            raise HTTPException(
+                status_code=status.HTTP_401_UNAUTHORIZED,
+                detail=f"Google token audience mismatch: {token_aud}",
+            )
+
         return id_info
+    except HTTPException:
+        raise
     except Exception as e:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,

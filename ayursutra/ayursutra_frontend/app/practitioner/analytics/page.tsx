@@ -67,7 +67,7 @@ export default function AnalyticsPage() {
   const statCards = [
     { icon: Users, label: "Total Patients", value: overview.unique_patients, sub: `${overview.total_plans} plans`, color: "text-blue-600", bg: "bg-blue-50" },
     { icon: CheckCircle, label: "Sessions Done", value: overview.completed_sessions, sub: `${overview.completion_rate}% completion rate`, color: "text-emerald-600", bg: "bg-emerald-50" },
-    { icon: Star, label: "Avg. Rating", value: overview.avg_rating.toFixed(1), sub: `From ${overview.total_feedback} reviews`, color: "text-amber-600", bg: "bg-amber-50" },
+    { icon: Star, label: "Avg. Rating", value: overview.total_feedback > 0 ? overview.avg_rating.toFixed(1) : "—", sub: overview.total_feedback > 0 ? `From ${overview.total_feedback} reviews` : "No ratings yet", color: "text-amber-600", bg: "bg-amber-50" },
     { icon: TrendingUp, label: "Avg. Improvement", value: overview.avg_improvement.toFixed(1) + "/5", sub: "Patient-reported", color: "text-purple-600", bg: "bg-purple-50" },
   ];
 
@@ -203,10 +203,12 @@ export default function AnalyticsPage() {
         <Card className="glass-card text-center">
           <CardContent className="p-6">
             <Star className="w-8 h-8 text-amber-500 mx-auto mb-2" />
-            <p className="text-3xl font-outfit font-bold text-ayur-green-dark">
-              {"⭐".repeat(Math.round(overview.avg_rating))}
+            <p className="text-2xl font-outfit font-bold text-ayur-green-dark">
+              {overview.total_feedback > 0 ? "⭐".repeat(Math.round(overview.avg_rating)) : "No Ratings Yet"}
             </p>
-            <p className="text-sm text-ayur-muted">{overview.avg_rating.toFixed(1)} average patient rating</p>
+            <p className="text-sm text-ayur-muted">
+              {overview.total_feedback > 0 ? `${overview.avg_rating.toFixed(1)} average patient rating` : "Awaiting patient session feedback"}
+            </p>
           </CardContent>
         </Card>
       </div>
