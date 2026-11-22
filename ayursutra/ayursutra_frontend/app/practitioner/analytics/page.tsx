@@ -245,19 +245,22 @@ export default function AnalyticsPage() {
                     : "Awaiting real-world submissions. Share the survey form with patients and clinic staff to collect authentic data."}
                 </p>
               </div>
-              {evalStats.total_evaluations > 0 ? (
-                <div className="bg-emerald-600 text-white rounded-2xl px-4 py-2 text-center shrink-0 shadow-xs">
-                  <span className="text-[10px] uppercase font-bold tracking-wider opacity-90 block">SUS Score</span>
-                  <span className="text-2xl font-outfit font-bold">{evalStats.system_usability_scale_score}</span>
-                  <span className="text-[10px] block opacity-80">Grade A+ (Live Data)</span>
-                </div>
-              ) : (
+              <div className="flex items-center gap-3">
+                {evalStats.total_evaluations > 0 && (
+                  <div className="bg-emerald-600 text-white rounded-2xl px-4 py-2 text-center shrink-0 shadow-xs">
+                    <span className="text-[10px] uppercase font-bold tracking-wider opacity-90 block">SUS Score</span>
+                    <span className="text-2xl font-outfit font-bold">{evalStats.system_usability_scale_score}</span>
+                    <span className="text-[10px] block opacity-80">
+                      {evalStats.system_usability_scale_score >= 80 ? "Grade A" : evalStats.system_usability_scale_score >= 70 ? "Grade B+ (Good)" : "Grade C"}
+                    </span>
+                  </div>
+                )}
                 <Link href="/survey">
-                  <Button className="bg-[#1E7E34] hover:bg-[#155D27] text-white text-xs font-semibold rounded-xl px-4 shadow-xs">
-                    Open Survey Form →
+                  <Button className="bg-[#1E7E34] hover:bg-[#155D27] text-white text-xs font-semibold rounded-xl px-3 py-2 shadow-xs">
+                    {evalStats.total_evaluations > 0 ? "Survey Form →" : "Open Survey Form →"}
                   </Button>
                 </Link>
-              )}
+              </div>
             </div>
           </CardHeader>
           <CardContent className="space-y-6">
