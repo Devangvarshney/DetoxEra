@@ -31,6 +31,16 @@ class AppEvaluation(Base):
     # Clinical Utility
     clinical_adherence_improved = Column(Boolean, default=True) # Did platform improve adherence?
     
+    # Phase-specific clinical compliance indicators
+    purvakarma_compliance = Column(Boolean, default=True, nullable=True) # Sneha/Sweda compliance
+    paschatkarma_diet_compliance = Column(Boolean, default=True, nullable=True) # Samsarjana Krama compliance
+    symptom_relief_rating = Column(Integer, nullable=True) # 1-5 patient-reported relief
+
+    # Practitioner-specific efficiency metrics
+    administrative_time_saved = Column(Integer, nullable=True) # Minutes saved per patient cycle
+    treatment_reset_prevented = Column(Boolean, default=True, nullable=True) # Avoided resetting 7-day protocol
+    template_satisfaction_rating = Column(Integer, nullable=True) # 1-5 template usability
+    
     # Qualitative Feedback
     liked_most = Column(Text, nullable=True) # What did you like most?
     improvement_suggestions = Column(Text, nullable=True) # What can be improved?

@@ -12,6 +12,12 @@ class AppEvaluationBase(BaseModel):
     overall_experience_rating: int = Field(ge=1, le=5, description="Overall satisfaction with AyurSutra platform (1-5)")
     recommend_score: int = Field(default=9, ge=1, le=10, description="Likelihood to recommend (1-10 NPS scale)")
     clinical_adherence_improved: bool = Field(default=True, description="Did AyurSutra help you stay disciplined to instructions?")
+    purvakarma_compliance: Optional[bool] = Field(default=True, description="Complied with pre-therapy fasting/ghee instructions")
+    paschatkarma_diet_compliance: Optional[bool] = Field(default=True, description="Complied with graduated post-therapy diet (Peya/Vilepi)")
+    symptom_relief_rating: Optional[int] = Field(default=None, ge=1, le=5, description="Subjective symptom relief (1-5)")
+    administrative_time_saved: Optional[int] = Field(default=None, description="Doctor: minutes saved per patient cycle")
+    treatment_reset_prevented: Optional[bool] = Field(default=None, description="Doctor: protocol reset avoided via timely alerts")
+    template_satisfaction_rating: Optional[int] = Field(default=None, ge=1, le=5, description="Doctor: template satisfaction rating (1-5)")
     liked_most: Optional[str] = Field(default=None, description="What features worked well or did you like most?")
     improvement_suggestions: Optional[str] = Field(default=None, description="Constructive suggestions for improvement")
 
