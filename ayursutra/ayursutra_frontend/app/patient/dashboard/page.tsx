@@ -1,17 +1,20 @@
 "use client";
 
+import { useState } from "react";
 import { useAuth } from "@/providers/auth-provider";
 import { useQuery } from "@tanstack/react-query";
 import { api } from "@/lib/api/client";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Calendar, Activity, FileText, ArrowRight, BookOpen, Leaf, TrendingUp, Sparkles, MapPin } from "lucide-react";
+import { Calendar, Activity, FileText, ArrowRight, BookOpen, Leaf, TrendingUp, Sparkles, MapPin, MessageSquareHeart } from "lucide-react";
 import Link from "next/link";
 import Image from "next/image";
+import { AppEvaluationModal } from "@/components/feedback/AppEvaluationModal";
 
 export default function PatientDashboard() {
   const { user } = useAuth();
+  const [isEvalModalOpen, setIsEvalModalOpen] = useState<boolean>(false);
 
   const { data: profile, isLoading: isProfileLoading } = useQuery({
     queryKey: ["patient-profile"],
@@ -60,14 +63,50 @@ export default function PatientDashboard() {
   return (
     <div className="container mx-auto p-6 max-w-6xl animate-fade-in">
       {/* Welcome Header */}
-      <div className="mb-6">
-        <p className="text-ayur-muted text-sm mb-1 font-medium">Welcome back</p>
-        <h1 className="text-3xl font-outfit font-bold text-ayur-green-dark">{profile?.name || "Patient"}</h1>
-        {(profile?.age || profile?.gender) && (
-          <p className="text-ayur-muted text-sm mt-1">
-            {profile?.age ? `${profile.age} yrs` : ""}{profile?.age && profile?.gender ? " · " : ""}{profile?.gender || ""}
-          </p>
-        )}
+      <div className="mb-6 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+        <div>
+          <p className="text-ayur-muted text-sm mb-1 font-medium">Welcome back</p>
+          <h1 className="text-3xl font-outfit font-bold text-ayur-green-dark">{profile?.name || "Patient"}</h1>
+          {(profile?.age || profile?.gender) && (
+            <p className="text-ayur-muted text-sm mt-1">
+              {profile?.age ? `${profile.age} yrs` : ""}{profile?.age && profile?.gender ? " · " : ""}{profile?.gender || ""}
+            </p>
+          )}
+        </div>
+
+        {/* 1-2 Days Post-Therapy Quick Survey Button */}
+        <Button
+          onClick={() => setIsEvalModalOpen(true)}
+          className="bg-[#1E7E34] hover:bg-[#155D27] text-white text-xs font-semibold rounded-xl px-4 py-2 shadow-xs flex items-center gap-2 cursor-pointer self-start sm:self-auto"
+        >
+          <MessageSquareHeart className="w-4 h-4 text-amber-300" />
+          <span>Post-Therapy App Survey (1-2 Days)</span>
+        </Button>
+      </div>
+
+      {/* 1-2 Days Post-Therapy Experience Survey Banner */}
+      <div className="mb-6 p-4 rounded-2xl bg-gradient-to-r from-emerald-50 via-teal-50 to-green-50 border border-emerald-200/80 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3.5 shadow-2xs">
+        <div className="flex items-start gap-3">
+          <div className="w-10 h-10 rounded-xl bg-[#1E7E34] text-white flex items-center justify-center shrink-0 shadow-xs">
+            <Sparkles className="w-5 h-5 text-amber-300" />
+          </div>
+          <div>
+            <div className="flex items-center gap-2">
+              <h4 className="font-outfit font-bold text-sm text-gray-900">Post-Therapy (1-2 Days) App Experience Survey</h4>
+              <span className="px-2 py-0.2 rounded-full bg-emerald-100 text-emerald-800 text-[10px] font-bold">Research Study</span>
+            </div>
+            <p className="text-xs text-gray-600 mt-0.5 leading-relaxed">
+              Did our automated Purvakarma/Paschatkarma precaution reminders and session scheduling help your recovery? Share your review to judge platform efficacy.
+            </p>
+          </div>
+        </div>
+        <Button
+          onClick={() => setIsEvalModalOpen(true)}
+          size="sm"
+          className="bg-[#1E7E34] hover:bg-[#155D27] text-white text-xs font-semibold rounded-xl px-4 shrink-0 shadow-xs cursor-pointer"
+        >
+          Take Survey
+        </Button>
       </div>
 
       {/* Stats Row */}
@@ -218,6 +257,13 @@ export default function PatientDashboard() {
           </CardContent>
         </Card>
       </div>
+
+      {/* ─── 1-2 Days Post-Therapy App Usability & Evaluation Survey Modal ─── */}
+      <AppEvaluationModal
+        isOpen={isEvalModalOpen}
+        onClose={() => setIsEvalModalOpen(false)}
+        therapyTitle="Panchakarma Protocol"
+      />
     </div>
   );
 }

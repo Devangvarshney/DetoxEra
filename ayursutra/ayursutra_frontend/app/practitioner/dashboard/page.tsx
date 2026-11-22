@@ -1,18 +1,21 @@
 "use client";
 
+import { useState } from "react";
 import { useAuth } from "@/providers/auth-provider";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { api } from "@/lib/api/client";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Users, FileText, Activity, BarChart2, Calendar, Check, X, ArrowRight, TrendingUp, Star } from "lucide-react";
+import { Users, FileText, Activity, BarChart2, Calendar, Check, X, ArrowRight, TrendingUp, Star, Sparkles, MessageSquareHeart } from "lucide-react";
 import Link from "next/link";
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid } from "recharts";
+import { AppEvaluationModal } from "@/components/feedback/AppEvaluationModal";
 
 export default function PractitionerDashboard() {
   const { user } = useAuth();
   const queryClient = useQueryClient();
+  const [isEvalModalOpen, setIsEvalModalOpen] = useState<boolean>(false);
 
   const { data: profile, isLoading: isProfileLoading } = useQuery({
     queryKey: ["practitioner-profile"],
@@ -90,11 +93,20 @@ export default function PractitionerDashboard() {
             <h1 className="text-2xl font-outfit font-bold text-white">{profile?.name}</h1>
             <p className="text-white/60 text-sm mt-1">{profile?.specialization} · {profile?.qualification}</p>
           </div>
-          <Link href="/practitioner/analytics">
-            <Button className="bg-ayur-accent text-white hover:bg-ayur-accent-hover gap-2">
-              <BarChart2 className="w-4 h-4" /> View Analytics
+          <div className="flex items-center gap-2.5">
+            <Button 
+              onClick={() => setIsEvalModalOpen(true)}
+              className="bg-white/20 hover:bg-white/30 text-white text-xs font-semibold rounded-xl border border-white/30 gap-1.5 cursor-pointer"
+            >
+              <MessageSquareHeart className="w-4 h-4 text-amber-300" />
+              <span>Post-Therapy Efficacy Survey</span>
             </Button>
-          </Link>
+            <Link href="/practitioner/analytics">
+              <Button className="bg-ayur-accent text-white hover:bg-ayur-accent-hover gap-2 text-xs font-semibold rounded-xl">
+                <BarChart2 className="w-4 h-4" /> View Analytics
+              </Button>
+            </Link>
+          </div>
         </div>
       </div>
 
@@ -287,6 +299,13 @@ export default function PractitionerDashboard() {
           </CardContent>
         </Card>
       </div>
+
+      {/* ─── Post-Therapy (1-2 Days) Doctor Platform Evaluation Modal ─── */}
+      <AppEvaluationModal
+        isOpen={isEvalModalOpen}
+        onClose={() => setIsEvalModalOpen(false)}
+        therapyTitle="Panchakarma Protocol (Doctor Assessment)"
+      />
     </div>
   );
 }

@@ -19,7 +19,7 @@ This guide explains how to deploy the AyurSutra FastAPI backend to **Render** (f
 4. Select your AyurSutra repository.
 5. Render will automatically detect [`render.yaml`](file:///e:/DetoxERA/DetoxEra/render.yaml) and configure:
    - **Service Name**: `ayursutra-backend`
-   - **Runtime**: Python 3.11
+   - **Runtime**: Python 3.13
    - **Build Command**: `pip install --upgrade pip && pip install -r requirements.txt`
    - **Start Command**: `uvicorn app.main:app --host 0.0.0.0 --port $PORT`
 6. Under Environment Variables, enter your database connection string in `DATABASE_URL` (see Database Options below).
@@ -44,7 +44,7 @@ This guide explains how to deploy the AyurSutra FastAPI backend to **Render** (f
 4. Add the following **Environment Variables**:
    | Variable | Value | Description |
    | :--- | :--- | :--- |
-   | `PYTHON_VERSION` | `3.11.9` | Ensures Python 3.11 is used |
+   | `PYTHON_VERSION` | `3.13.0` | Ensures Python 3.13 is used |
    | `SECRET_KEY` | *(Generate a 32+ character random string)* | JWT encryption key |
    | `ACCESS_TOKEN_EXPIRE_MINUTES` | `60` | Token validity |
    | `GOOGLE_CLIENT_ID` | `348329351587-7a722sgnm0tlcfs3gotue709jspsi3ph.apps.googleusercontent.com` | Google OAuth Client ID |

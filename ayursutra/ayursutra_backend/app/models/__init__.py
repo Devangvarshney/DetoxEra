@@ -5,4 +5,5 @@ from .practitioner_clinic import PractitionerClinic
 from .practitioner_review import PractitionerReview
 from .therapy import TreatmentRequest, TherapyTemplate, TherapyPlan, TherapySession, TherapyMilestone, RequestStatus, SessionStatus
 from .feedback import Feedback
+from .app_evaluation import AppEvaluation
 from .notification import Notification

@@ -72,7 +72,7 @@ AyurSutra utilizes a modern **Decoupled Client-Server & Mobile Hybrid Architectu
  ┌─────────────────────────────────────────────────────────────────────────────┐
  │                               BACKEND LAYER                                 │
  │                                                                             │
- │   FastAPI (Python 3.9+) on Uvicorn ASGI Server                              │
+ │   FastAPI (Python 3.13 / 3.10+) on Uvicorn ASGI Server                     │
  │   • API Routers (Auth, Patients, Practitioners, Therapy, Analytics, etc.)   │
  │   • Pydantic v2 (Input Validation & Output Schemata)                        │
  │   • Service Layer (Business Logic & Automation Engine)                      │
@@ -164,7 +164,7 @@ AyurSutra utilizes a modern **Decoupled Client-Server & Mobile Hybrid Architectu
 ### 3.5 DevOps, Tooling & Build Tools
 
 - **Node.js**: v18+ / v20+ JavaScript runtime.
-- **Python**: 3.9+ / 3.11+ backend runtime.
+- **Python**: 3.13+ (or 3.10+) backend runtime.
 - **Git**: Version control system tracking repository history and commits.
 - **Android Studio / Android SDK Platform-Tools**: Compiling the hybrid APK, signing debug keys, and managing ADB communication.
 

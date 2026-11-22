@@ -149,7 +149,7 @@ The new APK will be generated at:
 
 ### 1. Prerequisites
 - **Node.js**: v18+ (v20+ recommended)
-- **Python**: v3.10+
+- **Python**: v3.13+ (v3.10+ supported)
 - **Android Studio & SDK**: (Optional, only needed to rebuild APK)
 
 ### 2. Backend Setup

@@ -130,11 +130,11 @@ export function DoctorClinicsMapModal({
 
   return (
     <div
-      className="fixed inset-0 z-[100] bg-black/75 backdrop-blur-sm flex items-center justify-center p-3 sm:p-4 md:p-6 overflow-y-auto animate-fade-in"
+      className="fixed inset-0 z-[160] bg-black/80 backdrop-blur-sm flex flex-col items-center justify-start sm:justify-center p-2 pt-3 pb-24 sm:p-4 md:p-6 overflow-y-auto overscroll-contain animate-fade-in"
       onClick={onClose}
     >
       <div
-        className="bg-white rounded-2xl sm:rounded-3xl max-w-3xl w-full shadow-2xl border border-gray-200 overflow-hidden flex flex-col max-h-[calc(100dvh-1.5rem)] sm:max-h-[calc(100dvh-2.5rem)] my-auto animate-scale-in"
+        className="bg-white rounded-2xl sm:rounded-3xl max-w-3xl w-full shadow-2xl border border-gray-200 overflow-hidden flex flex-col h-[calc(100dvh-6.5rem)] sm:h-auto max-h-[calc(100dvh-6.5rem)] sm:max-h-[calc(100dvh-2.5rem)] my-auto animate-scale-in shrink-0"
         onClick={(e) => e.stopPropagation()}
       >
         {/* ─── Modal Header ─── */}
@@ -142,13 +142,13 @@ export function DoctorClinicsMapModal({
           <button
             type="button"
             onClick={onClose}
-            className="absolute top-3 right-3 sm:top-4 sm:right-4 w-8 h-8 rounded-full bg-white/10 hover:bg-white/20 text-white flex items-center justify-center transition-colors cursor-pointer"
+            className="absolute top-2.5 right-2.5 sm:top-4 sm:right-4 w-8 h-8 rounded-full bg-white/20 hover:bg-white/30 text-white flex items-center justify-center transition-colors cursor-pointer z-10"
             aria-label="Close modal"
           >
             <X className="w-4 h-4" />
           </button>
 
-          <div className="flex items-center gap-2 mb-1">
+          <div className="flex items-center gap-2 mb-1 pr-8">
             <span className="px-2.5 py-0.5 rounded-full bg-white/15 text-ayur-accent text-[11px] font-semibold flex items-center gap-1">
               <Compass className="w-3.5 h-3.5" /> Doctor Clinic Map Navigator
             </span>
@@ -158,10 +158,10 @@ export function DoctorClinicsMapModal({
             </span>
           </div>
 
-          <h3 className="text-xl sm:text-2xl font-outfit font-bold text-white">
+          <h3 className="text-lg sm:text-2xl font-outfit font-bold text-white pr-8">
             {doctor.doctorName}
           </h3>
-          <p className="text-white/80 text-xs mt-0.5">
+          <p className="text-white/80 text-xs mt-0.5 truncate pr-8">
             {doctor.qualification} · {doctor.specialization} · {doctor.experience || "Certified Vaidya"}
           </p>
         </div>
@@ -268,7 +268,7 @@ export function DoctorClinicsMapModal({
         </div>
 
         {/* ─── Map Viewport ─── */}
-        <div className="relative w-full h-[200px] xs:h-[230px] sm:h-[280px] md:h-[320px] bg-gray-100 overflow-hidden shrink-0">
+        <div className="relative w-full h-[140px] xs:h-[170px] sm:h-[260px] md:h-[300px] bg-gray-100 overflow-hidden shrink-0">
           {isIframeLoading && (
             <div className="absolute inset-0 z-20 bg-white/70 backdrop-blur-xs flex items-center justify-center">
               <span className="w-6 h-6 border-2 border-emerald-600 border-t-transparent rounded-full animate-spin" />
@@ -286,9 +286,9 @@ export function DoctorClinicsMapModal({
 
         {/* ─── Scrollable Selected Clinic Details ─── */}
         <div className="p-3 sm:p-4 bg-white space-y-2.5 overflow-y-auto min-h-0 flex-1">
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5 sm:gap-3">
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 sm:gap-3">
             {/* Address */}
-            <div className="p-2.5 sm:p-3 rounded-xl bg-gray-50 border border-gray-100 space-y-1">
+            <div className="p-2 sm:p-3 rounded-xl bg-gray-50 border border-gray-100 space-y-1">
               <span className="text-[10px] font-bold text-gray-500 uppercase tracking-wider flex items-center gap-1">
                 <MapPin className="w-3 h-3 text-red-500" /> Clinic Address
               </span>
@@ -298,7 +298,7 @@ export function DoctorClinicsMapModal({
             </div>
 
             {/* Timings */}
-            <div className="p-2.5 sm:p-3 rounded-xl bg-gray-50 border border-gray-100 space-y-1">
+            <div className="p-2 sm:p-3 rounded-xl bg-gray-50 border border-gray-100 space-y-1">
               <span className="text-[10px] font-bold text-gray-500 uppercase tracking-wider flex items-center gap-1">
                 <Clock className="w-3 h-3 text-emerald-600" /> Operating Hours
               </span>
@@ -308,7 +308,7 @@ export function DoctorClinicsMapModal({
             </div>
 
             {/* Consultation Fee & Phone */}
-            <div className="p-2.5 sm:p-3 rounded-xl bg-gray-50 border border-gray-100 space-y-1">
+            <div className="p-2 sm:p-3 rounded-xl bg-gray-50 border border-gray-100 space-y-1">
               <span className="text-[10px] font-bold text-gray-500 uppercase tracking-wider flex items-center gap-1">
                 <Phone className="w-3 h-3 text-blue-600" /> Fee & Contact
               </span>
@@ -331,15 +331,15 @@ export function DoctorClinicsMapModal({
           </div>
         </div>
 
-        {/* ─── Pinned Modal Action Footer (Never obscured or cut off) ─── */}
-        <div className="p-3 sm:p-4 bg-gray-50 border-t border-gray-200 flex items-center justify-between gap-3 shrink-0">
+        {/* ─── Pinned Modal Action Footer (Never obscured or cut off on phone) ─── */}
+        <div className="p-2.5 sm:p-4 bg-gray-50 border-t border-gray-200 flex items-center justify-between gap-2 shrink-0 pb-3 sm:pb-4">
           <Button
             variant="outline"
             size="sm"
             onClick={onClose}
-            className="text-xs rounded-xl border-gray-300 cursor-pointer"
+            className="text-xs rounded-xl border-gray-300 cursor-pointer min-h-[38px] px-3 shrink-0"
           >
-            Close Map
+            Close
           </Button>
 
           {onRequestBooking && (
@@ -349,10 +349,10 @@ export function DoctorClinicsMapModal({
                 onRequestBooking(doctor, activeClinic);
                 onClose();
               }}
-              className="bg-[#1E7E34] hover:bg-[#155D27] text-white text-xs font-semibold rounded-xl px-4 sm:px-5 shadow-xs flex items-center gap-1.5 cursor-pointer"
+              className="bg-[#1E7E34] hover:bg-[#155D27] text-white text-xs font-semibold rounded-xl px-3 sm:px-5 shadow-xs flex items-center gap-1.5 cursor-pointer min-h-[38px] flex-1 sm:flex-none justify-center"
             >
-              <Sparkles className="w-3.5 h-3.5 text-amber-300" />
-              <span>Book Consultation at this Clinic</span>
+              <Sparkles className="w-3.5 h-3.5 text-amber-300 shrink-0" />
+              <span className="truncate">Book Consultation</span>
             </Button>
           )}
         </div>

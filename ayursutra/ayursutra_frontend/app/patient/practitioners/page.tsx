@@ -498,20 +498,24 @@ export default function PatientPractitionersPage() {
                 >
                   {/* Top: Doctor Avatar & Bio */}
                   <div className="space-y-3.5">
-                    <div className="flex items-start gap-3.5">
-                      <div className="relative w-16 h-16 rounded-2xl overflow-hidden shrink-0 bg-gray-100 border border-gray-200 shadow-2xs">
+                    <div 
+                      onClick={() => setMapDoctor(doc)}
+                      className="flex items-start gap-3.5 cursor-pointer group"
+                      title="Click to view doctor profile & clinics"
+                    >
+                      <div className="relative w-16 h-16 rounded-2xl overflow-hidden shrink-0 bg-gray-100 border border-gray-200 shadow-2xs group-hover:ring-2 group-hover:ring-emerald-500 transition-all">
                         {/* eslint-disable-next-line @next/next/no-img-element */}
                         <img
                           src={doc.image}
                           alt={doc.doctorName}
-                          className="w-full h-full object-cover"
+                          className="w-full h-full object-cover group-hover:scale-105 transition-transform"
                         />
                         <div className="absolute bottom-1 right-1 w-3.5 h-3.5 rounded-full bg-emerald-500 border-2 border-white" title="Verified Practitioner" />
                       </div>
 
                       <div className="flex-1 min-w-0">
                         <div className="flex items-center gap-1.5">
-                          <h3 className="font-outfit font-bold text-base text-gray-900 truncate">
+                          <h3 className="font-outfit font-bold text-base text-gray-900 truncate group-hover:text-[#1E7E34] transition-colors">
                             {doc.doctorName}
                           </h3>
                         </div>
@@ -736,27 +740,27 @@ export default function PatientPractitionersPage() {
       {/* ─── Treatment Request Dialog Modal ─── */}
       {modalDoctor && (
         <div
-          className="fixed inset-0 z-[100] bg-black/75 backdrop-blur-sm flex items-center justify-center p-3 sm:p-4 overflow-y-auto animate-fade-in"
+          className="fixed inset-0 z-[160] bg-black/80 backdrop-blur-sm flex flex-col items-center justify-start sm:justify-center p-2 pt-3 pb-24 sm:p-4 overflow-y-auto overscroll-contain animate-fade-in"
           onClick={() => setModalDoctor(null)}
         >
           <div
-            className="bg-white rounded-2xl sm:rounded-3xl max-w-lg w-full shadow-2xl border border-ayur-border overflow-hidden animate-scale-in max-h-[calc(100dvh-2rem)] flex flex-col my-auto"
+            className="bg-white rounded-2xl sm:rounded-3xl max-w-lg w-full shadow-2xl border border-ayur-border overflow-hidden animate-scale-in h-[calc(100dvh-6.5rem)] sm:h-auto max-h-[calc(100dvh-6.5rem)] sm:max-h-[calc(100dvh-2rem)] flex flex-col my-auto shrink-0"
             onClick={(e) => e.stopPropagation()}
           >
             {/* Modal Header */}
-            <div className="hero-gradient p-5 sm:p-6 text-white relative shrink-0">
+            <div className="hero-gradient p-4 sm:p-6 text-white relative shrink-0">
               <button
                 type="button"
                 onClick={() => setModalDoctor(null)}
-                className="absolute top-4 right-4 w-8 h-8 rounded-full bg-white/10 hover:bg-white/20 text-white flex items-center justify-center transition-colors cursor-pointer"
+                className="absolute top-3 right-3 sm:top-4 sm:right-4 w-8 h-8 rounded-full bg-white/20 hover:bg-white/30 text-white flex items-center justify-center transition-colors cursor-pointer z-10"
               >
                 <X className="w-4 h-4" />
               </button>
-              <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-white/15 text-ayur-accent text-xs font-semibold mb-2">
+              <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-white/15 text-ayur-accent text-xs font-semibold mb-1 sm:mb-2 pr-8">
                 <Sparkles className="w-3.5 h-3.5" /> Book Consultation
               </div>
-              <h3 className="text-xl font-outfit font-bold">{modalDoctor.doctorName}</h3>
-              <p className="text-white/80 text-xs mt-0.5">
+              <h3 className="text-lg sm:text-xl font-outfit font-bold pr-8">{modalDoctor.doctorName}</h3>
+              <p className="text-white/80 text-xs mt-0.5 pr-8">
                 {modalDoctor.qualification} · {modalDoctor.specialization} ({modalDoctor.city})
               </p>
             </div>
@@ -888,27 +892,27 @@ export default function PatientPractitionersPage() {
       {/* ─── Practitioner Reviews & Feedback Modal ─── */}
       {reviewModalDoctor && (
         <div
-          className="fixed inset-0 z-[100] bg-black/75 backdrop-blur-sm flex items-center justify-center p-3 sm:p-4 overflow-y-auto animate-fade-in"
+          className="fixed inset-0 z-[160] bg-black/80 backdrop-blur-sm flex flex-col items-center justify-start sm:justify-center p-2 pt-3 pb-24 sm:p-4 overflow-y-auto overscroll-contain animate-fade-in"
           onClick={() => setReviewModalDoctor(null)}
         >
           <div
-            className="bg-white rounded-2xl sm:rounded-3xl max-w-xl w-full shadow-2xl border border-ayur-border overflow-hidden animate-scale-in max-h-[calc(100dvh-2rem)] flex flex-col my-auto"
+            className="bg-white rounded-2xl sm:rounded-3xl max-w-xl w-full shadow-2xl border border-ayur-border overflow-hidden animate-scale-in h-[calc(100dvh-6.5rem)] sm:h-auto max-h-[calc(100dvh-6.5rem)] sm:max-h-[calc(100dvh-2rem)] flex flex-col my-auto shrink-0"
             onClick={(e) => e.stopPropagation()}
           >
             {/* Modal Header */}
-            <div className="hero-gradient p-5 sm:p-6 text-white relative shrink-0">
+            <div className="hero-gradient p-4 sm:p-6 text-white relative shrink-0">
               <button
                 type="button"
                 onClick={() => setReviewModalDoctor(null)}
-                className="absolute top-4 right-4 w-8 h-8 rounded-full bg-white/10 hover:bg-white/20 text-white flex items-center justify-center transition-colors cursor-pointer"
+                className="absolute top-3 right-3 sm:top-4 sm:right-4 w-8 h-8 rounded-full bg-white/20 hover:bg-white/30 text-white flex items-center justify-center transition-colors cursor-pointer z-10"
               >
                 <X className="w-4 h-4" />
               </button>
-              <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-white/15 text-ayur-accent text-xs font-semibold mb-2">
+              <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-white/15 text-ayur-accent text-xs font-semibold mb-1 sm:mb-2 pr-8">
                 <Star className="w-3.5 h-3.5 fill-amber-300 text-amber-300" /> Patient Feedback & Reviews
               </div>
-              <h3 className="text-xl font-outfit font-bold">{reviewModalDoctor.doctorName}</h3>
-              <p className="text-white/80 text-xs mt-0.5">
+              <h3 className="text-lg sm:text-xl font-outfit font-bold pr-8">{reviewModalDoctor.doctorName}</h3>
+              <p className="text-white/80 text-xs mt-0.5 pr-8">
                 {reviewModalDoctor.qualification} · {reviewModalDoctor.specialization} ({reviewModalDoctor.city})
               </p>
             </div>

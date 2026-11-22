@@ -37,6 +37,18 @@ export default function AnalyticsPage() {
     },
   });
 
+  const { data: evalStats } = useQuery({
+    queryKey: ["app-evaluation-stats"],
+    queryFn: async () => {
+      try {
+        const res = await api.get("/feedback/app-evaluation/stats");
+        return res.data;
+      } catch {
+        return null;
+      }
+    },
+  });
+
   if (isLoading) {
     return (
       <div className="container mx-auto p-6 max-w-6xl">
@@ -212,6 +224,111 @@ export default function AnalyticsPage() {
           </CardContent>
         </Card>
       </div>
+
+      {/* ─── Academic Research & App Evaluation Survey Figures (1-2 Days Post-Therapy) ─── */}
+      {evalStats && (
+        <Card className="glass-card mb-8 border-emerald-200/80 bg-gradient-to-br from-emerald-50/50 via-white to-teal-50/30">
+          <CardHeader className="pb-3">
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
+              <div>
+                <span className="px-2.5 py-0.5 rounded-full bg-emerald-100 text-emerald-800 text-[10px] font-bold uppercase tracking-wider">
+                  Empirical Project Results & Research Evaluation
+                </span>
+                <CardTitle className="text-xl font-outfit font-bold text-gray-900 mt-1">
+                  1-2 Days Post-Therapy App Usability & Clinical Adherence Study
+                </CardTitle>
+                <p className="text-xs text-gray-600 mt-0.5">
+                  Aggregate figures based on {evalStats.total_evaluations} verified responses ({evalStats.patient_count} Patients · {evalStats.practitioner_count} Practitioners).
+                </p>
+              </div>
+              <div className="bg-emerald-600 text-white rounded-2xl px-4 py-2 text-center shrink-0 shadow-xs">
+                <span className="text-[10px] uppercase font-bold tracking-wider opacity-90 block">SUS Score</span>
+                <span className="text-2xl font-outfit font-bold">{evalStats.system_usability_scale_score}</span>
+                <span className="text-[10px] block opacity-80">Grade A+ (Excellent)</span>
+              </div>
+            </div>
+          </CardHeader>
+          <CardContent className="space-y-6">
+            {/* 4 Numerical Criteria Grid */}
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+              <div className="p-3.5 rounded-xl bg-white border border-gray-200 shadow-2xs">
+                <span className="text-[11px] text-gray-500 font-semibold block">App UI & Navigation</span>
+                <div className="flex items-baseline gap-1 mt-1">
+                  <span className="text-2xl font-outfit font-bold text-emerald-700">{evalStats.avg_app_usability}</span>
+                  <span className="text-xs text-gray-400">/ 5.0</span>
+                </div>
+                <div className="w-full bg-gray-100 h-1.5 rounded-full mt-2 overflow-hidden">
+                  <div className="bg-emerald-600 h-full rounded-full" style={{ width: `${(evalStats.avg_app_usability / 5) * 100}%` }} />
+                </div>
+              </div>
+
+              <div className="p-3.5 rounded-xl bg-white border border-gray-200 shadow-2xs">
+                <span className="text-[11px] text-gray-500 font-semibold block">Precaution Clarity</span>
+                <div className="flex items-baseline gap-1 mt-1">
+                  <span className="text-2xl font-outfit font-bold text-emerald-700">{evalStats.avg_precautions_clarity}</span>
+                  <span className="text-xs text-gray-400">/ 5.0</span>
+                </div>
+                <div className="w-full bg-gray-100 h-1.5 rounded-full mt-2 overflow-hidden">
+                  <div className="bg-emerald-600 h-full rounded-full" style={{ width: `${(evalStats.avg_precautions_clarity / 5) * 100}%` }} />
+                </div>
+              </div>
+
+              <div className="p-3.5 rounded-xl bg-white border border-gray-200 shadow-2xs">
+                <span className="text-[11px] text-gray-500 font-semibold block">Scheduling Convenience</span>
+                <div className="flex items-baseline gap-1 mt-1">
+                  <span className="text-2xl font-outfit font-bold text-emerald-700">{evalStats.avg_scheduling_convenience}</span>
+                  <span className="text-xs text-gray-400">/ 5.0</span>
+                </div>
+                <div className="w-full bg-gray-100 h-1.5 rounded-full mt-2 overflow-hidden">
+                  <div className="bg-emerald-600 h-full rounded-full" style={{ width: `${(evalStats.avg_scheduling_convenience / 5) * 100}%` }} />
+                </div>
+              </div>
+
+              <div className="p-3.5 rounded-xl bg-white border border-gray-200 shadow-2xs">
+                <span className="text-[11px] text-gray-500 font-semibold block">Adherence Improvement</span>
+                <div className="flex items-baseline gap-1 mt-1">
+                  <span className="text-2xl font-outfit font-bold text-emerald-700">{evalStats.adherence_improvement_percentage}%</span>
+                  <span className="text-xs text-emerald-600 font-semibold">vs paper logs</span>
+                </div>
+                <div className="w-full bg-gray-100 h-1.5 rounded-full mt-2 overflow-hidden">
+                  <div className="bg-[#1E7E34] h-full rounded-full" style={{ width: `${evalStats.adherence_improvement_percentage}%` }} />
+                </div>
+              </div>
+            </div>
+
+            {/* Qualitative Feedback Snippets */}
+            {evalStats.recent_evaluations && evalStats.recent_evaluations.length > 0 && (
+              <div className="space-y-2.5">
+                <h4 className="text-xs font-bold text-gray-700 uppercase tracking-wider">
+                  Recent Qualitative User Testimonials & Feedback
+                </h4>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                  {evalStats.recent_evaluations.slice(0, 4).map((item: any, idx: number) => (
+                    <div key={item.id || idx} className="p-3 rounded-xl bg-white border border-gray-200 text-xs space-y-1.5 shadow-2xs">
+                      <div className="flex items-center justify-between">
+                        <span className="font-bold text-gray-900">{item.user_name || "Study Participant"}</span>
+                        <span className="px-2 py-0.2 rounded-full bg-gray-100 text-gray-600 text-[10px] font-semibold capitalize">
+                          {item.role} · {item.days_post_therapy}d post-therapy
+                        </span>
+                      </div>
+                      {item.liked_most && (
+                        <p className="text-gray-700 text-[11px]">
+                          <strong className="text-emerald-800">Liked:</strong> {item.liked_most}
+                        </p>
+                      )}
+                      {item.improvement_suggestions && (
+                        <p className="text-gray-500 text-[11px]">
+                          <strong className="text-amber-800">Improvement Suggestion:</strong> {item.improvement_suggestions}
+                        </p>
+                      )}
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+          </CardContent>
+        </Card>
+      )}
     </div>
   );
 }
