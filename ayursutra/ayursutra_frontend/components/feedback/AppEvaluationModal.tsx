@@ -43,6 +43,17 @@ export function AppEvaluationModal({
   const [overallRating, setOverallRating] = useState<number>(5);
   const [recommendScore, setRecommendScore] = useState<number>(10);
   const [adherenceImproved, setAdherenceImproved] = useState<boolean>(true);
+  
+  // Patient specific
+  const [purvakarmaCompliance, setPurvakarmaCompliance] = useState<boolean>(true);
+  const [paschatkarmaDietCompliance, setPaschatkarmaDietCompliance] = useState<boolean>(true);
+  const [symptomRelief, setSymptomRelief] = useState<number>(5);
+
+  // Doctor specific
+  const [timeSaved, setTimeSaved] = useState<number>(20);
+  const [treatmentResetPrevented, setTreatmentResetPrevented] = useState<boolean>(true);
+  const [templateSatisfaction, setTemplateSatisfaction] = useState<number>(5);
+
   const [likedMost, setLikedMost] = useState<string>("");
   const [improvementSuggestions, setImprovementSuggestions] = useState<string>("");
 
@@ -58,7 +69,7 @@ export function AppEvaluationModal({
     setErrorMessage(null);
 
     try {
-      await api.post("/feedback/app-evaluation", {
+      const payload: any = {
         therapy_plan_id: therapyPlanId || null,
         therapy_title: therapyTitle || "Panchakarma Protocol",
         days_post_therapy: daysPostTherapy,
@@ -70,7 +81,19 @@ export function AppEvaluationModal({
         clinical_adherence_improved: adherenceImproved,
         liked_most: likedMost.trim() || null,
         improvement_suggestions: improvementSuggestions.trim() || null
-      });
+      };
+
+      if (!isPractitioner) {
+        payload.purvakarma_compliance = purvakarmaCompliance;
+        payload.paschatkarma_diet_compliance = paschatkarmaDietCompliance;
+        payload.symptom_relief_rating = symptomRelief;
+      } else {
+        payload.administrative_time_saved = timeSaved;
+        payload.treatment_reset_prevented = treatmentResetPrevented;
+        payload.template_satisfaction_rating = templateSatisfaction;
+      }
+
+      await api.post("/feedback/app-evaluation", payload);
 
       setSubmitSuccess(true);
       if (onSuccess) onSuccess();
