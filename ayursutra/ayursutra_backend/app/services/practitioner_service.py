@@ -1,5 +1,5 @@
 from typing import Optional, List
-from sqlalchemy.orm import Session
+from sqlalchemy.orm import Session, selectinload
 from fastapi import HTTPException
 from app.models.practitioner import Practitioner
 from app.models.practitioner_clinic import PractitionerClinic
@@ -9,7 +9,10 @@ from app.schemas.practitioner_clinic import PractitionerClinicCreate
 from app.schemas.practitioner_review import PractitionerReviewCreate
 
 def get_practitioners(db: Session, city: Optional[str] = None, only_completed: bool = False):
-    query = db.query(Practitioner)
+    query = db.query(Practitioner).options(
+        selectinload(Practitioner.clinics),
+        selectinload(Practitioner.reviews)
+    )
     if only_completed:
         query = query.filter(Practitioner.is_profile_completed == True)
     if city and city.strip():
@@ -17,7 +20,10 @@ def get_practitioners(db: Session, city: Optional[str] = None, only_completed: b
     return query.all()
 
 def get_practitioner(db: Session, practitioner_id: int) -> Practitioner:
-    practitioner = db.query(Practitioner).filter(Practitioner.id == practitioner_id).first()
+    practitioner = db.query(Practitioner).options(
+        selectinload(Practitioner.clinics),
+        selectinload(Practitioner.reviews)
+    ).filter(Practitioner.id == practitioner_id).first()
     if not practitioner:
         raise HTTPException(status_code=404, detail="Practitioner not found")
     return practitioner

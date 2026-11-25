@@ -1,100 +1,100 @@
-[2026-11-22 16:11:40] [INFO] ================================================================================
-[2026-11-22 16:11:40] [INFO] TEST CASE : TC-01 | Module: Auth | Title: Register a patient
-[2026-11-22 16:11:40] [INFO] STATUS    : PASSED
-[2026-11-22 16:11:40] [INFO] DETAILS   : Patient registered: tc_patient_1795344099@ayursutra.com (User ID: 51, Profile ID: 32) and verified login.
-[2026-11-22 16:11:40] [INFO] ================================================================================
-[2026-11-22 16:11:42] [INFO] ================================================================================
-[2026-11-22 16:11:42] [INFO] TEST CASE : TC-02 | Module: Auth | Title: Register a practitioner
-[2026-11-22 16:11:42] [INFO] STATUS    : PASSED
-[2026-11-22 16:11:42] [INFO] DETAILS   : Practitioner registered: tc_practitioner_1795344099@ayursutra.com (User ID: 52, Profile ID: 20, City: Delhi).
-[2026-11-22 16:11:42] [INFO] ================================================================================
-[2026-11-22 16:11:42] [INFO] ================================================================================
-[2026-11-22 16:11:42] [INFO] TEST CASE : TC-03 | Module: Auth | Title: Valid login
-[2026-11-22 16:11:42] [INFO] STATUS    : PASSED
-[2026-11-22 16:11:42] [INFO] DETAILS   : Bearer token received, /auth/me successfully validated for user: tc_patient_1795344099@ayursutra.com
-[2026-11-22 16:11:42] [INFO] ================================================================================
-[2026-11-22 16:11:43] [INFO] ================================================================================
-[2026-11-22 16:11:43] [INFO] TEST CASE : TC-04 | Module: Auth | Title: Invalid login
-[2026-11-22 16:11:43] [INFO] STATUS    : PASSED
-[2026-11-22 16:11:43] [INFO] DETAILS   : Denied access with HTTP 401 and 'Incorrect email or password' detail. No token issued.
-[2026-11-22 16:11:43] [INFO] ================================================================================
-[2026-11-22 16:11:44] [INFO] ================================================================================
-[2026-11-22 16:11:44] [INFO] TEST CASE : TC-05 | Module: Auth | Title: Google sign-in
-[2026-11-22 16:11:44] [INFO] STATUS    : PASSED
-[2026-11-22 16:11:44] [INFO] DETAILS   : Google sign-in succeeded for google_test_1795344103@ayursutra.com, returning Bearer token and creating active profile.
-[2026-11-22 16:11:44] [INFO] ================================================================================
-[2026-11-22 16:11:44] [INFO] ================================================================================
-[2026-11-22 16:11:44] [INFO] TEST CASE : TC-06 | Module: RBAC | Title: Patient calls a practitioner endpoint
-[2026-11-22 16:11:44] [INFO] STATUS    : PASSED
-[2026-11-22 16:11:44] [INFO] DETAILS   : Patient calling POST /therapy/plans was rejected with HTTP 403: The user doesn't have enough privileges
-[2026-11-22 16:11:44] [INFO] ================================================================================
-[2026-11-22 16:11:44] [INFO] ================================================================================
-[2026-11-22 16:11:44] [INFO] TEST CASE : TC-07 | Module: RBAC | Title: Access without or with expired token
-[2026-11-22 16:11:44] [INFO] STATUS    : PASSED
-[2026-11-22 16:11:44] [INFO] DETAILS   : Both missing token and expired token were rejected with HTTP 401 Unauthorized.
-[2026-11-22 16:11:44] [INFO] ================================================================================
-[2026-11-22 16:11:45] [INFO] ================================================================================
-[2026-11-22 16:11:45] [INFO] TEST CASE : TC-08 | Module: Discovery | Title: Filter by city
-[2026-11-22 16:11:45] [INFO] STATUS    : PASSED
-[2026-11-22 16:11:45] [INFO] DETAILS   : Found 10 practitioners matching city 'Delhi'. All results confirmed in Delhi.
-[2026-11-22 16:11:45] [INFO] ================================================================================
-[2026-11-22 16:11:46] [INFO] ================================================================================
-[2026-11-22 16:11:46] [INFO] TEST CASE : TC-09 | Module: Requests | Title: Send request
-[2026-11-22 16:11:46] [INFO] STATUS    : PASSED
-[2026-11-22 16:11:46] [INFO] DETAILS   : Treatment request created with ID: 21, status: pending
-[2026-11-22 16:11:46] [INFO] ================================================================================
-[2026-11-22 16:11:47] [INFO] ================================================================================
-[2026-11-22 16:11:47] [INFO] TEST CASE : TC-10 | Module: Requests | Title: Accept or reject request
-[2026-11-22 16:11:47] [INFO] STATUS    : PASSED
-[2026-11-22 16:11:47] [INFO] DETAILS   : Practitioner accepted request 21. Patient confirmed status is 'accepted'.
-[2026-11-22 16:11:47] [INFO] ================================================================================
-[2026-11-22 16:11:49] [INFO] ================================================================================
-[2026-11-22 16:11:49] [INFO] TEST CASE : TC-11 | Module: Plans | Title: Create plan from template
-[2026-11-22 16:11:49] [INFO] STATUS    : PASSED
-[2026-11-22 16:11:49] [INFO] DETAILS   : Therapy plan 16 created with 5 sequential sessions (IDs: [70, 71, 72, 73, 74]).
-[2026-11-22 16:11:49] [INFO] ================================================================================
-[2026-11-22 16:11:50] [INFO] ================================================================================
-[2026-11-22 16:11:50] [INFO] TEST CASE : TC-12 | Module: Scheduling | Title: Schedule a session
-[2026-11-22 16:11:50] [INFO] STATUS    : PASSED
-[2026-11-22 16:11:50] [INFO] DETAILS   : Session 70 scheduled for 2026-11-01 09:30:00 with pre-precautions. Confirmed on patient timeline.
-[2026-11-22 16:11:50] [INFO] ================================================================================
-[2026-11-22 16:11:51] [INFO] ================================================================================
-[2026-11-22 16:11:51] [INFO] TEST CASE : TC-13 | Module: Scheduling | Title: Complete a session
-[2026-11-22 16:11:51] [INFO] STATUS    : PASSED
-[2026-11-22 16:11:51] [INFO] DETAILS   : Session 70 marked completed. Plan progress increased to 20.0% (1/5 sessions).
-[2026-11-22 16:11:51] [INFO] ================================================================================
-[2026-11-22 16:11:51] [INFO] ================================================================================
-[2026-11-22 16:11:51] [INFO] TEST CASE : TC-14 | Module: Precautions | Title: Precaution notifications
-[2026-11-22 16:11:51] [INFO] STATUS    : PASSED
-[2026-11-22 16:11:51] [INFO] DETAILS   : Precaution notifications verified for patient. Unread count = 4.
-[2026-11-22 16:11:51] [INFO] ================================================================================
-[2026-11-22 16:11:52] [INFO] ================================================================================
-[2026-11-22 16:11:52] [INFO] TEST CASE : TC-15 | Module: Feedback | Title: Submit feedback
-[2026-11-22 16:11:52] [INFO] STATUS    : PASSED
-[2026-11-22 16:11:52] [INFO] DETAILS   : Feedback submitted successfully: Rating=4, Comments='Felt deeply relaxed after the session. Mild initial thirst resolved quickly.'. Visible to practitioner.
-[2026-11-22 16:11:52] [INFO] ================================================================================
-[2026-11-22 16:11:53] [INFO] ================================================================================
-[2026-11-22 16:11:53] [INFO] TEST CASE : TC-16 | Module: Feedback | Title: Duplicate or invalid feedback
-[2026-11-22 16:11:53] [INFO] STATUS    : PASSED
-[2026-11-22 16:11:53] [INFO] DETAILS   : Both duplicate feedback (HTTP 409) and invalid rating 7 (HTTP 422) were rejected as expected.
-[2026-11-22 16:11:53] [INFO] ================================================================================
-[2026-11-22 16:11:53] [INFO] ================================================================================
-[2026-11-22 16:11:53] [INFO] TEST CASE : TC-17 | Module: Analytics | Title: Dashboards
-[2026-11-22 16:11:53] [INFO] STATUS    : PASSED
-[2026-11-22 16:11:53] [INFO] DETAILS   : Practitioner & Patient analytics verified. Completion rate=20.0%, Total plans=1.
-[2026-11-22 16:11:53] [INFO] ================================================================================
-[2026-11-22 16:11:54] [INFO] ================================================================================
-[2026-11-22 16:11:54] [INFO] TEST CASE : TC-18 | Module: Milestones | Title: Add and achieve milestone
-[2026-11-22 16:11:54] [INFO] STATUS    : PASSED
-[2026-11-22 16:11:54] [INFO] DETAILS   : Milestone 6 added and marked achieved. is_achieved=True, achieved_at=2026-11-22T10:41:54.359042Z
-[2026-11-22 16:11:54] [INFO] ================================================================================
-[2026-11-22 16:11:54] [INFO] ================================================================================
-[2026-11-22 16:11:54] [INFO] TEST CASE : TC-19 | Module: Mobile | Title: APK install and login
-[2026-11-22 16:11:54] [INFO] STATUS    : PASSED
-[2026-11-22 16:11:54] [INFO] DETAILS   : APK verified (75.8 MB, valid Android ZIP, AndroidManifest.xml, classes.dex). Mobile authentication with capacitor://localhost succeeded.
-[2026-11-22 16:11:54] [INFO] ================================================================================
-[2026-11-22 16:11:54] [INFO] ================================================================================
-[2026-11-22 16:11:54] [INFO] TEST CASE : TC-20 | Module: Mobile / UI | Title: Back button and responsive layout
-[2026-11-22 16:11:55] [INFO] STATUS    : PASSED
-[2026-11-22 16:11:55] [INFO] DETAILS   : Verified native backButton event handling, double-press exit toast, modal close priority, and phone-width bottom navigation.
-[2026-11-22 16:11:55] [INFO] ================================================================================
+[2026-11-25 20:00:21] [INFO] ================================================================================
+[2026-11-25 20:00:21] [INFO] TEST CASE : TC-01 | Module: Auth | Title: Register a patient
+[2026-11-25 20:00:21] [INFO] STATUS    : PASSED
+[2026-11-25 20:00:21] [INFO] DETAILS   : Patient registered: tc_patient_1795617019@ayursutra.com (User ID: 54, Profile ID: 34) and verified login.
+[2026-11-25 20:00:21] [INFO] ================================================================================
+[2026-11-25 20:00:23] [INFO] ================================================================================
+[2026-11-25 20:00:23] [INFO] TEST CASE : TC-02 | Module: Auth | Title: Register a practitioner
+[2026-11-25 20:00:23] [INFO] STATUS    : PASSED
+[2026-11-25 20:00:23] [INFO] DETAILS   : Practitioner registered: tc_practitioner_1795617019@ayursutra.com (User ID: 55, Profile ID: 21, City: Delhi).
+[2026-11-25 20:00:23] [INFO] ================================================================================
+[2026-11-25 20:00:23] [INFO] ================================================================================
+[2026-11-25 20:00:23] [INFO] TEST CASE : TC-03 | Module: Auth | Title: Valid login
+[2026-11-25 20:00:23] [INFO] STATUS    : PASSED
+[2026-11-25 20:00:23] [INFO] DETAILS   : Bearer token received, /auth/me successfully validated for user: tc_patient_1795617019@ayursutra.com
+[2026-11-25 20:00:23] [INFO] ================================================================================
+[2026-11-25 20:00:24] [INFO] ================================================================================
+[2026-11-25 20:00:24] [INFO] TEST CASE : TC-04 | Module: Auth | Title: Invalid login
+[2026-11-25 20:00:24] [INFO] STATUS    : PASSED
+[2026-11-25 20:00:24] [INFO] DETAILS   : Denied access with HTTP 401 and 'Incorrect email or password' detail. No token issued.
+[2026-11-25 20:00:24] [INFO] ================================================================================
+[2026-11-25 20:00:24] [INFO] ================================================================================
+[2026-11-25 20:00:24] [INFO] TEST CASE : TC-05 | Module: Auth | Title: Google sign-in
+[2026-11-25 20:00:24] [INFO] STATUS    : PASSED
+[2026-11-25 20:00:24] [INFO] DETAILS   : Google sign-in succeeded for google_test_1795617024@ayursutra.com, returning Bearer token and creating active profile.
+[2026-11-25 20:00:24] [INFO] ================================================================================
+[2026-11-25 20:00:24] [INFO] ================================================================================
+[2026-11-25 20:00:24] [INFO] TEST CASE : TC-06 | Module: RBAC | Title: Patient calls a practitioner endpoint
+[2026-11-25 20:00:24] [INFO] STATUS    : PASSED
+[2026-11-25 20:00:24] [INFO] DETAILS   : Patient calling POST /therapy/plans was rejected with HTTP 403: The user doesn't have enough privileges
+[2026-11-25 20:00:24] [INFO] ================================================================================
+[2026-11-25 20:00:24] [INFO] ================================================================================
+[2026-11-25 20:00:24] [INFO] TEST CASE : TC-07 | Module: RBAC | Title: Access without or with expired token
+[2026-11-25 20:00:24] [INFO] STATUS    : PASSED
+[2026-11-25 20:00:24] [INFO] DETAILS   : Both missing token and expired token were rejected with HTTP 401 Unauthorized.
+[2026-11-25 20:00:24] [INFO] ================================================================================
+[2026-11-25 20:00:25] [INFO] ================================================================================
+[2026-11-25 20:00:25] [INFO] TEST CASE : TC-08 | Module: Discovery | Title: Filter by city
+[2026-11-25 20:00:25] [INFO] STATUS    : PASSED
+[2026-11-25 20:00:25] [INFO] DETAILS   : Found 11 practitioners matching city 'Delhi'. All results confirmed in Delhi.
+[2026-11-25 20:00:25] [INFO] ================================================================================
+[2026-11-25 20:00:26] [INFO] ================================================================================
+[2026-11-25 20:00:26] [INFO] TEST CASE : TC-09 | Module: Requests | Title: Send request
+[2026-11-25 20:00:26] [INFO] STATUS    : PASSED
+[2026-11-25 20:00:26] [INFO] DETAILS   : Treatment request created with ID: 22, status: pending
+[2026-11-25 20:00:26] [INFO] ================================================================================
+[2026-11-25 20:00:27] [INFO] ================================================================================
+[2026-11-25 20:00:27] [INFO] TEST CASE : TC-10 | Module: Requests | Title: Accept or reject request
+[2026-11-25 20:00:27] [INFO] STATUS    : PASSED
+[2026-11-25 20:00:27] [INFO] DETAILS   : Practitioner accepted request 22. Patient confirmed status is 'accepted'.
+[2026-11-25 20:00:27] [INFO] ================================================================================
+[2026-11-25 20:00:29] [INFO] ================================================================================
+[2026-11-25 20:00:29] [INFO] TEST CASE : TC-11 | Module: Plans | Title: Create plan from template
+[2026-11-25 20:00:29] [INFO] STATUS    : PASSED
+[2026-11-25 20:00:29] [INFO] DETAILS   : Therapy plan 17 created with 5 sequential sessions (IDs: [75, 76, 77, 78, 79]).
+[2026-11-25 20:00:29] [INFO] ================================================================================
+[2026-11-25 20:00:29] [INFO] ================================================================================
+[2026-11-25 20:00:29] [INFO] TEST CASE : TC-12 | Module: Scheduling | Title: Schedule a session
+[2026-11-25 20:00:29] [INFO] STATUS    : PASSED
+[2026-11-25 20:00:29] [INFO] DETAILS   : Session 75 scheduled for 2026-11-01 09:30:00 with pre-precautions. Confirmed on patient timeline.
+[2026-11-25 20:00:29] [INFO] ================================================================================
+[2026-11-25 20:00:30] [INFO] ================================================================================
+[2026-11-25 20:00:30] [INFO] TEST CASE : TC-13 | Module: Scheduling | Title: Complete a session
+[2026-11-25 20:00:30] [INFO] STATUS    : PASSED
+[2026-11-25 20:00:30] [INFO] DETAILS   : Session 75 marked completed. Plan progress increased to 20.0% (1/5 sessions).
+[2026-11-25 20:00:30] [INFO] ================================================================================
+[2026-11-25 20:00:30] [INFO] ================================================================================
+[2026-11-25 20:00:30] [INFO] TEST CASE : TC-14 | Module: Precautions | Title: Precaution notifications
+[2026-11-25 20:00:30] [INFO] STATUS    : PASSED
+[2026-11-25 20:00:30] [INFO] DETAILS   : Precaution notifications verified for patient. Unread count = 4.
+[2026-11-25 20:00:30] [INFO] ================================================================================
+[2026-11-25 20:00:31] [INFO] ================================================================================
+[2026-11-25 20:00:31] [INFO] TEST CASE : TC-15 | Module: Feedback | Title: Submit feedback
+[2026-11-25 20:00:31] [INFO] STATUS    : PASSED
+[2026-11-25 20:00:31] [INFO] DETAILS   : Feedback submitted successfully: Rating=4, Comments='Felt deeply relaxed after the session. Mild initial thirst resolved quickly.'. Visible to practitioner.
+[2026-11-25 20:00:31] [INFO] ================================================================================
+[2026-11-25 20:00:32] [INFO] ================================================================================
+[2026-11-25 20:00:32] [INFO] TEST CASE : TC-16 | Module: Feedback | Title: Duplicate or invalid feedback
+[2026-11-25 20:00:32] [INFO] STATUS    : PASSED
+[2026-11-25 20:00:32] [INFO] DETAILS   : Both duplicate feedback (HTTP 409) and invalid rating 7 (HTTP 422) were rejected as expected.
+[2026-11-25 20:00:32] [INFO] ================================================================================
+[2026-11-25 20:00:33] [INFO] ================================================================================
+[2026-11-25 20:00:33] [INFO] TEST CASE : TC-17 | Module: Analytics | Title: Dashboards
+[2026-11-25 20:00:33] [INFO] STATUS    : PASSED
+[2026-11-25 20:00:33] [INFO] DETAILS   : Practitioner & Patient analytics verified. Completion rate=20.0%, Total plans=1.
+[2026-11-25 20:00:33] [INFO] ================================================================================
+[2026-11-25 20:00:34] [INFO] ================================================================================
+[2026-11-25 20:00:34] [INFO] TEST CASE : TC-18 | Module: Milestones | Title: Add and achieve milestone
+[2026-11-25 20:00:34] [INFO] STATUS    : PASSED
+[2026-11-25 20:00:34] [INFO] DETAILS   : Milestone 7 added and marked achieved. is_achieved=True, achieved_at=2026-11-25T14:30:34.456619Z
+[2026-11-25 20:00:34] [INFO] ================================================================================
+[2026-11-25 20:00:35] [INFO] ================================================================================
+[2026-11-25 20:00:35] [INFO] TEST CASE : TC-19 | Module: Mobile | Title: APK install and login
+[2026-11-25 20:00:35] [INFO] STATUS    : PASSED
+[2026-11-25 20:00:35] [INFO] DETAILS   : APK verified (75.8 MB, valid Android ZIP, AndroidManifest.xml, classes.dex). Mobile authentication with capacitor://localhost succeeded.
+[2026-11-25 20:00:35] [INFO] ================================================================================
+[2026-11-25 20:00:35] [INFO] ================================================================================
+[2026-11-25 20:00:35] [INFO] TEST CASE : TC-20 | Module: Mobile / UI | Title: Back button and responsive layout
+[2026-11-25 20:00:35] [INFO] STATUS    : PASSED
+[2026-11-25 20:00:35] [INFO] DETAILS   : Verified native backButton event handling, double-press exit toast, modal close priority, and phone-width bottom navigation.
+[2026-11-25 20:00:35] [INFO] ================================================================================
