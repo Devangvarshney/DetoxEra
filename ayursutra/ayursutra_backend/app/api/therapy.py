@@ -35,10 +35,8 @@ def read_plan(plan_id: int, current_user: User = Depends(get_current_user), db: 
 
 @router.get("/plans/{plan_id}/sessions", response_model=List[TherapySession])
 def read_plan_sessions(plan_id: int, current_user: User = Depends(get_current_user), db: Session = Depends(get_db)):
-    plan = db.query(TherapyPlanModel).filter(TherapyPlanModel.id == plan_id).first()
-    if plan:
-        return plan.sessions
-    return []
+    from app.models.therapy import TherapySession as TherapySessionModel
+    return db.query(TherapySessionModel).filter(TherapySessionModel.therapy_plan_id == plan_id).order_by(TherapySessionModel.session_number.asc()).all()
 
 @router.get("/sessions", response_model=List[TherapySession])
 def read_all_sessions(current_user: User = Depends(get_current_user), db: Session = Depends(get_db)):

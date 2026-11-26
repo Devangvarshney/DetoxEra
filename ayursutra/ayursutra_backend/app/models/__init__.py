@@ -7,4 +7,4 @@ from .therapy import TreatmentRequest, TherapyTemplate, TherapyPlan, TherapySess
 from .feedback import Feedback
 from .app_evaluation import AppEvaluation
 from .notification import Notification
-from .research_benchmark import ClinicalAdherenceBenchmark, PractitionerEfficiencyBenchmark
+from .research_benchmark import ClinicalAdherenceBenchmark, PractitionerEfficiencyBenchmark, Standard10ItemSUSEvaluation
